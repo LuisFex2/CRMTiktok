@@ -1,6 +1,6 @@
 # TikTok AI CRM & Automation Platform 🚀
 
-Sistema inteligente de automatización conversacional y CRM para **TikTok**, diseñado para la cuenta `@rematesvillaelsalvador` (Remates Villa El Salvador / Grupo Rhinn SAC) e integrado con la API oficial a través de **Zernio**.
+Sistema inteligente de automatización conversacional y CRM para **TikTok**, diseñado para la cuenta `@rematesvillaelsalvador` (Remates Villa El Salvador / Grupo Rhinn SAC).
 
 ---
 
@@ -26,10 +26,10 @@ Sistema inteligente de automatización conversacional y CRM para **TikTok**, dis
 ## 📁 Estructura del Proyecto
 
 ```text
-zernio/
+CRMTiktok/
 ├── config.json          # Datos de tienda, horarios, plantillas y WhatsApp
 ├── aiEngine.js          # Motor de clasificación de intenciones y generación de respuestas
-├── zernioClient.js      # Cliente SDK modular para la API de Zernio
+├── zernioClient.js      # Cliente SDK modular para la API
 ├── db.js                # Gestor de base de datos local JSON
 ├── server.js            # Servidor Express y bucles de sincronización
 ├── data/
@@ -39,7 +39,7 @@ zernio/
 │   ├── index.html       # Dashboard web
 │   ├── styles.css       # Estilos CSS dark theme enterprise
 │   └── app.js           # Lógica del cliente web
-├── .env                 # API Key de Zernio y puerto
+├── .env                 # API Key y puerto
 └── README.md            # Documentación técnica
 ```
 
@@ -71,26 +71,34 @@ Si no deseas tener tu computadora encendida todo el día, puedes correrlo direct
 2. **Instalar Node.js y Git:**
    Abre Termux y escribe:
    ```bash
-   pkg update -y && pkg install nodejs -y
+   pkg update -y && pkg install nodejs git -y
    ```
 
-3. **Copiar el proyecto y entrar a la carpeta:**
+3. **Clonar el proyecto y entrar a la carpeta:**
    ```bash
-   cd zernio
+   git clone https://github.com/LuisFex2/CRMTiktok.git
+   cd CRMTiktok
    npm install
    ```
 
-4. **Evitar que Android duerma el proceso:**
+4. **Crear archivo de configuración:**
+   ```bash
+   cat << 'EOF' > .env
+   ZERNIO_API_KEY=sk_65c7b23d3c7810d72fd8cf51377e553086af620ae49ecd7b5f03cb5a00779b79
+   PORT=3000
+   EOF
+   ```
+
+5. **Evitar que Android duerma el proceso:**
    ```bash
    termux-wake-lock
    ```
-   *(También asegúrate de marcar Termux como "Sin restricciones de batería" en los Ajustes de tu teléfono).*
 
-5. **Iniciar el servidor:**
+6. **Iniciar el servidor:**
    ```bash
-   node server.js
+   npm start
    ```
 
-6. **Abrir el CRM en tu móvil:**
+7. **Abrir el CRM en tu móvil:**
    Abre Chrome en tu celular y entra a:
    👉 `http://localhost:3000`
