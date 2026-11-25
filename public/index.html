@@ -31,7 +31,11 @@
       </button>
       <button class="drawer-item" data-view="rules">
         <span class="drawer-icon">⚡</span>
-        <span>Flujos y Palabras Clave</span>
+        <span>Automatizaciones (Reglas)</span>
+      </button>
+      <button class="drawer-item" data-view="agent">
+        <span class="drawer-icon">🤖</span>
+        <span>Agente de IA</span>
       </button>
       <button class="drawer-item" data-view="simulator">
         <span class="drawer-icon">🧪</span>
@@ -233,6 +237,70 @@
           </div>
         </div>
 
+        <!-- TAB: AGENTE DE IA (INSPIRADO EN SAAS KOMMO / MANYCHAT) -->
+        <div class="tab-content" id="agentTab">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h4 style="font-size: 1.25rem;">Agentes de IA</h4>
+                <p class="section-desc" style="margin-bottom: 0;">Cree y gestione agentes de IA con fuentes de conocimiento y prompt para respuestas automatizadas.</p>
+              </div>
+
+              <!-- SWITCH PRINCIPAL DEL AGENTE IA -->
+              <div class="toggle-container" style="background: rgba(37, 244, 238, 0.08); border-color: rgba(37, 244, 238, 0.3);">
+                <span class="toggle-label" style="color: #fff; font-weight: 700;">⚡ Modo agéntico (IA):</span>
+                <label class="switch">
+                  <input type="checkbox" id="aiAgentSwitch" checked>
+                  <span class="slider round"></span>
+                </label>
+                <span class="toggle-status" id="aiAgentStatusText">ACTIVO</span>
+              </div>
+            </div>
+
+            <!-- TARJETAS DE RESUMEN COMO LA REFERENCIA SAAS -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+                <span style="font-size: 0.75rem; color: var(--text-dim); display: block;">Agentes totales</span>
+                <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 0.25rem;">1</h3>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+                <span style="font-size: 0.75rem; color: var(--text-dim); display: block;">Estado del Agente</span>
+                <h3 id="cardAgentState" style="font-size: 1.1rem; font-weight: 800; margin-top: 0.4rem; color: var(--accent-green);">🟢 Activo</h3>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+                <span style="font-size: 0.75rem; color: var(--text-dim); display: block;">Modelo de IA</span>
+                <h3 style="font-size: 1.1rem; font-weight: 800; margin-top: 0.4rem; color: var(--tiktok-cyan);">Gemini 3.5 Flash</h3>
+              </div>
+            </div>
+
+            <!-- EXPLICACIÓN DINÁMICA DEL ESTADO -->
+            <div id="aiModeNoticeBox" class="info-alert" style="margin-bottom: 1.5rem;">
+              <strong id="aiModeNoticeTitle">🟢 Modo Agéntico Activo:</strong>
+              <p id="aiModeNoticeDesc" style="margin-top: 0.25rem;">
+                El bot primero responderá con tus <strong>reglas de palabras clave</strong>. Si el cliente escribe con faltas de ortografía (ej. <em>"aun tienen en stok"</em>) o hace preguntas abiertas, el Agente IA de Gemini analiza la intención y responde según tu Prompt oficial.
+              </p>
+            </div>
+
+            <form id="agentSettingsForm" class="form-group">
+              <label>Token / API Key de Google Gemini (Google AI Studio):</label>
+              <input type="text" id="cfgAgentGeminiKey" placeholder="Pega aquí tu clave AQ... o AIzaSy..." style="margin-bottom: 0.5rem;">
+
+              <label>Prompt del Agente (Personalidad, Reglas del Negocio y WhatsApp):</label>
+              <textarea id="cfgAgentPrompt" rows="9" style="font-family: monospace; font-size: 0.82rem; line-height: 1.45;" placeholder="Instrucciones para la IA..."></textarea>
+              <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
+                💡 Puedes cambiar este prompt para vender o adaptar el CRM a cualquier otro negocio (ropa, clínicas, inmobiliarias, etc.).
+              </small>
+
+              <div style="display:flex; align-items:center; gap:0.75rem; margin-top:1.25rem;">
+                <button type="submit" class="btn-primary">
+                  💾 Guardar Agente de IA
+                </button>
+                <span id="agentSaveNotice" class="save-notice"></span>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <!-- TAB 3: CONFIGURACIÓN GENERAL / REGLAS DE NEGOCIO -->
         <div class="tab-content" id="configTab">
           <div class="card">
@@ -264,63 +332,27 @@
           </div>
         </div>
 
-        <!-- TAB 4: INTEGRACIÓN API & TOKENS -->
+        <!-- TAB 4: CONEXIÓN TIKTOK API & WEBHOOKS -->
         <div class="tab-content" id="webhookTab">
           <div class="card">
-            <h4>Integración API & Inteligencia Artificial</h4>
-            <p class="section-desc">Gestiona tus claves de acceso, selecciona el modo de respuestas y conecta servicios externos sin tocar código:</p>
+            <h4>Conexión Oficial TikTok API & Webhooks</h4>
+            <p class="section-desc">Estado de la vinculación con tu cuenta de TikTok y configuración de eventos en tiempo real:</p>
 
-            <form id="apiSettingsForm" class="form-group">
-              <!-- SECCIÓN 1: INTELIGENCIA ARTIFICIAL GEMINI -->
-              <div class="rule-box" style="border-left: 3px solid var(--tiktok-cyan); margin-bottom: 1.25rem;">
-                <div class="rule-box-header">
-                  <span class="rule-title">🧠 Motor de Inteligencia Artificial (Google Gemini)</span>
-                  <span class="rule-pill pill-wa">Control Inteligente</span>
-                </div>
-
-                <label>Modo de Respuesta del Bot:</label>
-                <select id="cfgReplyMode" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:0.65rem; color:#fff; font-size:0.85rem; margin-top:0.3rem; margin-bottom:0.85rem;">
-                  <option value="hybrid">🟢 Híbrido Inteligente (Reglas fijas + IA rescata faltas ortográficas)</option>
-                  <option value="rules_only">⚡ Solo Reglas y Palabras Clave (Sin IA - Cero consumo de tokens)</option>
-                  <option value="gemini_only">🧠 Solo Inteligencia Artificial (Gemini analiza y responde todo)</option>
-                </select>
-
-                <label>Token / API Key de Gemini (Google AI Studio):</label>
-                <input type="text" id="cfgGeminiKey" placeholder="Pega aquí tu clave AQ... o AIzaSy..." style="margin-top:0.3rem;">
-                <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
-                  💡 Puedes cambiar o renovar tu Token aquí en cualquier momento sin tocar el código.
-                </small>
-
-                <label style="margin-top:0.85rem; display:block;">Instrucciones del Sistema para la IA (System Prompt):</label>
-                <textarea id="cfgAiPrompt" rows="8" style="font-family:monospace; font-size:0.8rem; line-height:1.4; margin-top:0.3rem;" placeholder="Escribe aquí las instrucciones de tu negocio. Puedes usar {businessName}, {address}, {whatsapp}, {text}"></textarea>
-                <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
-                  💡 Puedes reescribir este prompt para adaptar el CRM a cualquier otro negocio (ropa, inmobiliarias, clínicas, etc.).
-                </small>
+            <!-- CONEXIÓN TIKTOK -->
+            <div class="rule-box" style="border-left: 3px solid var(--tiktok-red); margin-bottom: 1.25rem;">
+              <div class="rule-box-header">
+                <span class="rule-title">🎵 Cuenta Oficial de TikTok</span>
+                <span class="rule-pill" style="color:var(--accent-green); background:rgba(16,185,129,0.15);">Conexión Activa</span>
               </div>
 
-              <!-- SECCIÓN 2: CONEXIÓN TIKTOK -->
-              <div class="rule-box" style="border-left: 3px solid var(--tiktok-red); margin-bottom: 1.25rem;">
-                <div class="rule-box-header">
-                  <span class="rule-title">🎵 Conexión Oficial TikTok</span>
-                  <span class="rule-pill" style="color:var(--tiktok-red);">API Activa</span>
-                </div>
+              <label>TikTok Account ID:</label>
+              <input type="text" id="cfgAccountId" value="6b045c6eb9e97da7ab40d8a7" style="margin-top:0.3rem;" readonly>
+              <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
+                Cuenta vinculada en producción: <strong>@rematesvillaelsalvador</strong> (17.0K seguidores).
+              </small>
+            </div>
 
-                <label>TikTok Account ID:</label>
-                <input type="text" id="cfgAccountId" value="6b045c6eb9e97da7ab40d8a7" style="margin-top:0.3rem;" readonly>
-                <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
-                  Identificador oficial de la cuenta vinculada: <strong>@rematesvillaelsalvador</strong>.
-                </small>
-              </div>
-
-              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem;">
-                <button type="submit" class="btn-primary">
-                  💾 Guardar Configuración de APIs y Token
-                </button>
-                <span id="apiSaveNotice" class="save-notice"></span>
-              </div>
-            </form>
-
-            <!-- SECCIÓN 3: WEBHOOKS -->
+            <!-- SECCIÓN WEBHOOKS -->
             <div class="webhook-box">
               <label>Endpoint de recepción de eventos (Webhooks):</label>
               <div class="copy-field">
@@ -331,7 +363,7 @@
 
             <div class="info-alert">
               <strong>💡 Conexión de Alta Disponibilidad:</strong>
-              <p>El motor sincroniza activamente la API oficial de TikTok. Si deseas recibir notificaciones Push mediante Webhooks, puedes mapear este puerto (<code>3000</code>) con tu dominio o túnel seguro (Cloudflare / ngrok).</p>
+              <p>El motor sincroniza activamente la API oficial de TikTok cada 10 segundos. Si deseas recibir notificaciones Push mediante Webhooks, puedes mapear este puerto (<code>3000</code>) con tu dominio o túnel seguro (Cloudflare / ngrok).</p>
             </div>
           </div>
         </div>

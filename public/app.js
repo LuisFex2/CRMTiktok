@@ -301,23 +301,104 @@ async function loadBusinessConfig() {
       document.getElementById('cfgDelivery').value = data.businessInfo.delivery || '';
       document.getElementById('cfgPayments').value = data.businessInfo.cardPayment || '';
     }
-    const replyModeSelect = document.getElementById('cfgReplyMode');
-    if (replyModeSelect) {
-      replyModeSelect.value = data.replyMode || 'hybrid';
+
+    updateAgentUiState(data.aiAgentEnabled !== false);
+
+    const agentKeyInput = document.getElementById('cfgAgentGeminiKey');
+    if (agentKeyInput) {
+      agentKeyInput.value = data.geminiApiKey || '';
     }
-    const geminiKeyInput = document.getElementById('cfgGeminiKey');
-    if (geminiKeyInput) {
-      geminiKeyInput.value = data.geminiApiKey || '';
-    }
-    const aiPromptInput = document.getElementById('cfgAiPrompt');
-    if (aiPromptInput) {
-      aiPromptInput.value = data.aiSystemPrompt || '';
+    const agentPromptInput = document.getElementById('cfgAgentPrompt');
+    if (agentPromptInput) {
+      agentPromptInput.value = data.aiSystemPrompt || '';
     }
   } catch (err) {
     console.warn('Error al cargar config:', err);
   }
 }
 
+// 11. Control de Estado y Formulario del Agente de IA
+const aiAgentSwitch = document.getElementById('aiAgentSwitch');
+const aiAgentStatusText = document.getElementById('aiAgentStatusText');
+const cardAgentState = document.getElementById('cardAgentState');
+const aiModeNoticeTitle = document.getElementById('aiModeNoticeTitle');
+const aiModeNoticeDesc = document.getElementById('aiModeNoticeDesc');
+
+function updateAgentUiState(enabled) {
+  if (aiAgentSwitch) aiAgentSwitch.checked = enabled;
+  if (aiAgentStatusText) {
+    aiAgentStatusText.textContent = enabled ? 'ACTIVO' : 'EN PAUSA';
+    aiAgentStatusText.style.color = enabled ? '#10B981' : '#94A3B8';
+  }
+  if (cardAgentState) {
+    cardAgentState.textContent = enabled ? '🟢 Activo' : '⚪ En Pausa';
+    cardAgentState.style.color = enabled ? '#10B981' : '#94A3B8';
+  }
+  if (aiModeNoticeTitle) {
+    aiModeNoticeTitle.textContent = enabled ? '🟢 Modo Agéntico Activo:' : '⚪ Modo Tradicional Activo (Solo Reglas):';
+  }
+  if (aiModeNoticeDesc) {
+    aiModeNoticeDesc.innerHTML = enabled
+      ? 'El bot responderá a tus <strong>reglas de palabras clave</strong> y, si el cliente escribe con faltas de ortografía (ej. <em>"aun tienen en stok"</em>) o dudas abiertas, la IA de Gemini analiza y responde con tu Prompt oficial.'
+      : 'La Inteligencia Artificial está <strong>apagada</strong> (cero consumo de tokens). El bot responde <strong>ÚNICAMENTE</strong> cuando el cliente escribe exactamente las palabras clave de la pestaña <strong>Automatizaciones</strong>.';
+  }
+}
+
+if (aiAgentSwitch) {
+  aiAgentSwitch.addEventListener('change', async (e) => {
+    const enabled = e.target.checked;
+    updateAgentUiState(enabled);
+    try {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aiAgentEnabled: enabled })
+      });
+    } catch (err) {
+      console.error('Error al actualizar estado del agente:', err);
+    }
+  });
+}
+
+const agentSettingsForm = document.getElementById('agentSettingsForm');
+if (agentSettingsForm) {
+  agentSettingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const notice = document.getElementById('agentSaveNotice');
+    if (notice) {
+      notice.textContent = 'Guardando...';
+      notice.style.color = '#F59E0B';
+    }
+
+    const payload = {
+      geminiApiKey: document.getElementById('cfgAgentGeminiKey')?.value.trim() || '',
+      aiSystemPrompt: document.getElementById('cfgAgentPrompt')?.value || ''
+    };
+
+    try {
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        if (notice) {
+          notice.textContent = '✅ Agente de IA y Prompt guardados con éxito';
+          notice.style.color = '#10B981';
+          setTimeout(() => { notice.textContent = ''; }, 3500);
+        }
+      }
+    } catch (err) {
+      if (notice) {
+        notice.textContent = '❌ Error al guardar';
+        notice.style.color = '#EF4444';
+      }
+    }
+  });
+}
+
+// 12. Formulario de Tienda Física
 const configForm = document.getElementById('configForm');
 if (configForm) {
   configForm.addEventListener('submit', async (e) => {
@@ -349,46 +430,6 @@ if (configForm) {
       }
     } catch (err) {
       saveNotice.textContent = '❌ Error al guardar';
-    }
-  });
-}
-
-// 11. Formulario de Integración API & Tokens
-const apiSettingsForm = document.getElementById('apiSettingsForm');
-if (apiSettingsForm) {
-  apiSettingsForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const notice = document.getElementById('apiSaveNotice');
-    if (notice) {
-      notice.textContent = 'Guardando...';
-      notice.style.color = '#F59E0B';
-    }
-
-    const payload = {
-      replyMode: document.getElementById('cfgReplyMode')?.value || 'hybrid',
-      geminiApiKey: document.getElementById('cfgGeminiKey')?.value.trim() || '',
-      aiSystemPrompt: document.getElementById('cfgAiPrompt')?.value || ''
-    };
-
-    try {
-      const res = await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.ok) {
-        if (notice) {
-          notice.textContent = '✅ Token y Modo de IA guardados con éxito';
-          notice.style.color = '#10B981';
-          setTimeout(() => { notice.textContent = ''; }, 3500);
-        }
-      }
-    } catch (err) {
-      if (notice) {
-        notice.textContent = '❌ Error al guardar';
-        notice.style.color = '#EF4444';
-      }
     }
   });
 }
@@ -583,6 +624,7 @@ function switchView(viewName) {
   const tabMapping = {
     'inbox': null,
     'rules': 'rulesEditorTab',
+    'agent': 'agentTab',
     'simulator': 'simulatorTab',
     'config': 'configTab',
     'api': 'webhookTab'

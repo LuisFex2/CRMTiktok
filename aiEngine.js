@@ -34,6 +34,7 @@ export class AIEngine {
   // 1. EVALUACIÓN INTELIGENTE CON GOOGLE GEMINI (COMPRENDE ERRORES Y SLANG)
   // ---------------------------------------------------------------------------
   async consultGemini(text, isDM = false) {
+    if (this.config.aiAgentEnabled === false) return null;
     const apiKey = this.config.geminiApiKey || process.env.GEMINI_API_KEY;
     if (!apiKey) return null;
 
@@ -94,7 +95,7 @@ Instrucciones de clasificación y respuesta:
   async generateCommentResponse({ text }) {
     const rawText = (text || '').trim();
     const rules = this.config.rules || {};
-    const mode = this.config.replyMode || 'hybrid';
+    const aiEnabled = this.config.aiAgentEnabled !== false;
 
     // 2.1 FILTRO RÁPIDO DE SILENCIO (BROMAS, RISAS, MEMES) -> NO RESPONDER
     if (this.matchesKeywords(rawText, rules.silenceKeywords)) {
@@ -107,12 +108,7 @@ Instrucciones de clasificación y respuesta:
       return null;
     }
 
-    // MODO SOLO IA: Salta las palabras fijas y consulta directamente a Gemini
-    if (mode === 'gemini_only') {
-      return await this.consultGemini(rawText, false);
-    }
-
-    // 2.2 REGLAS DINÁMICAS DIRECTAS DEL CRM (Palabras clave)
+    // 2.2 REGLAS DINÁMICAS DIRECTAS DEL CRM (Palabras clave fijas de Automatizaciones)
     const commentRules = rules.comments || [];
     for (const rule of commentRules) {
       if (this.matchesKeywords(rawText, rule.keywords)) {
@@ -120,17 +116,15 @@ Instrucciones de clasificación y respuesta:
       }
     }
 
-    // SI EL MODO ES 'rules_only', NO llama a Gemini y guarda silencio si no hay coincidencia
-    if (mode === 'rules_only') {
-      return null;
+    // 2.3 AGENTE DE IA: Solo si el switch de Agente IA está encendido
+    if (aiEnabled) {
+      const geminiReply = await this.consultGemini(rawText, false);
+      if (geminiReply) {
+        return geminiReply;
+      }
     }
 
-    // 2.3 MODO HÍBRIDO (DEFAULT): Si ninguna regla fija coincidió, la IA analiza y rescata
-    const geminiReply = await this.consultGemini(rawText, false);
-    if (geminiReply) {
-      return geminiReply;
-    }
-
+    // Si la IA está apagada o no encontró intención comercial -> Silencio total
     return null;
   }
 
@@ -148,21 +142,10 @@ Instrucciones de clasificación y respuesta:
 
     const rawText = (text || '').trim();
     const rules = this.config.rules || {};
-    const mode = this.config.replyMode || 'hybrid';
+    const aiEnabled = this.config.aiAgentEnabled !== false;
     const dmRules = rules.dms || [];
 
-    // MODO SOLO IA EN DMS
-    if (mode === 'gemini_only') {
-      const geminiReply = await this.consultGemini(rawText, true);
-      if (geminiReply) {
-        return {
-          message: geminiReply,
-          followUp: this.getOfficialWhatsapp()
-        };
-      }
-    }
-
-    // 3.1 EVALUAR REGLAS DINÁMICAS DE DM (Palabras clave)
+    // 3.1 EVALUAR REGLAS DINÁMICAS DE DM (Palabras clave fijas)
     for (const rule of dmRules) {
       if (this.matchesKeywords(rawText, rule.keywords)) {
         return {
@@ -172,8 +155,8 @@ Instrucciones de clasificación y respuesta:
       }
     }
 
-    // 3.2 SI EL MODO ES HÍBRIDO: Consultar a Gemini si no coincidió con ninguna regla fija
-    if (mode === 'hybrid') {
+    // 3.2 CONSULTAR AL AGENTE DE IA (Solo si está encendido)
+    if (aiEnabled) {
       const geminiReply = await this.consultGemini(rawText, true);
       if (geminiReply) {
         return {
