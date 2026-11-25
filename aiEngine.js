@@ -195,6 +195,12 @@ Instrucciones de clasificación y respuesta:
     const rules = this.config.rules || {};
     const aiEnabled = this.config.aiAgentEnabled !== false;
 
+    // Detectar si es una pregunta puramente informativa (horarios, ubicación, pagos, agradecimiento)
+    // En estos casos, 1 sola respuesta es mucho más humana; no se debe forzar la 2da burbuja con el número suelto.
+    const lower = rawText.toLowerCase();
+    const isInfoOnly = /(horario|hora|atienden|abren|cierran|domingo|feriado|donde|d[oó]nde|direcci[oó]n|ubicaci[oó]n|llegar|tarjeta|pago|yape|gracias|ok|dale|listo)/i.test(lower) &&
+      !/(precio|cuanto|cu[aá]nto|cuesta|vale|modelo|catalogo|cat[aá]logo|foto|stock|frijider|lavadora|cocina|televisor|tv|refrigerador)/i.test(lower);
+
     const dmRules = rules.dms || [];
 
     // 3.1 EVALUAR REGLAS DINAMICAS DE DM (solo si rulesEnabled !== false)
@@ -203,21 +209,27 @@ Instrucciones de clasificación y respuesta:
         if (this.matchesKeywords(rawText, rule.keywords)) {
           return {
             message: rule.message,
-            followUp: rule.sendWhatsappBubble ? this.getOfficialWhatsapp() : null
+            followUp: (rule.sendWhatsappBubble && !isInfoOnly) ? this.getOfficialWhatsapp() : null
           };
         }
       }
     }
-    // 3.2 CONSULTAR AL AGENTE DE IA (Solo si está encendido)
+
+    // 3.2 CONSULTAR AL AGENTE DE IA (Gemini con memoria y naturalidad)
     if (aiEnabled) {
       const geminiReply = await this.consultGemini(rawText, true, history);
       if (geminiReply === '__SILENCE__') {
         return { message: null, followUp: null };
       }
       if (geminiReply) {
+        // Enviar bloque 2 (número suelto para copiar rápido) SOLO cuando el cliente
+        // pregunte por precios, fotos, catálogo o modelos específicos.
+        // Si solo pregunta horario, ubicación o es saludo/agradecimiento -> 1 sola respuesta limpia.
+        const needsWhatsappBubble = !isInfoOnly && /(precio|cuanto|cu[aá]nto|cuesta|vale|modelo|catalogo|cat[aá]logo|foto|fotos|stock|frijider|lavadora|cocina|televisor|tv|contacto|whatsapp|wsp|comprar)/i.test(lower);
+
         return {
           message: geminiReply,
-          followUp: this.getOfficialWhatsapp()
+          followUp: needsWhatsappBubble ? this.getOfficialWhatsapp() : null
         };
       }
     }
@@ -230,7 +242,7 @@ Instrucciones de clasificación y respuesta:
 
     return {
       message: fallback.message,
-      followUp: fallback.sendWhatsappBubble ? this.getOfficialWhatsapp() : null
+      followUp: isInfoOnly ? null : (fallback.sendWhatsappBubble ? this.getOfficialWhatsapp() : null)
     };
   }
 }
