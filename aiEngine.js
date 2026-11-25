@@ -49,11 +49,17 @@ export class AIEngine {
 
     const phone = this.getOfficialWhatsapp();
     const address = this.config.businessInfo?.address || 'Av. Velasco Alvarado 718, Villa El Salvador';
+    const hours = this.config.businessInfo?.openingHours || 'Lunes a Sábado de 9:00 am a 8:00 pm';
+    const payments = this.config.businessInfo?.cardPayment || 'Tarjeta con 5% recargo POS, Yape o transferencia';
+    const delivery = this.config.businessInfo?.delivery || 'Solo tienda física, no hacemos envíos';
     const store = this.config.businessName || 'Remates Villa El Salvador';
 
     const defaultPrompt = `Eres el asistente oficial de ventas en TikTok de la tienda "{businessName}".
 Ubicación física: {address}.
+Horario de atención: {hours}.
 WhatsApp oficial de ventas: {whatsapp}.
+Métodos de pago: {payments}.
+Entregas: {delivery}.
 Reglas de negocio:
 - Solo atendemos y vendemos en tienda física. NO hacemos envíos ni delivery.
 - Aceptamos tarjeta (con 5% de recargo POS), Yape o transferencia.
@@ -64,7 +70,8 @@ El usuario escribió el siguiente mensaje o comentario en TikTok:
 
 Instrucciones de clasificación y respuesta:
 1. Si el comentario es un meme, risas (jajaja, xd, 😂), crítica vacía, broma o NO tiene ninguna intención de compra o consulta sobre productos/tienda, responde ÚNICAMENTE la palabra: SILENCIO
-2. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos como "stok", "keda", "frijider", "a cuanto"):
+2. Si el usuario pregunta horario, ubicación, formas de pago o envíos, respóndele directamente con la información que tienes arriba. No lo mandes al WhatsApp si ya puedes resolver su duda con los datos que tienes.
+3. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos como "stok", "keda", "frijider", "a cuanto"):
    - Responde amablemente en 1 o máximo 2 oraciones directas, cordiales y comerciales invitando a escribir al WhatsApp {whatsapp} para pasarle fotos reales de los modelos disponibles.
    - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp {whatsapp}.`;
 
@@ -72,7 +79,10 @@ Instrucciones de clasificación y respuesta:
     let systemPrompt = template
       .replace(/{businessName}/g, store)
       .replace(/{address}/g, address)
+      .replace(/{hours}/g, hours)
       .replace(/{whatsapp}/g, phone)
+      .replace(/{payments}/g, payments)
+      .replace(/{delivery}/g, delivery)
       .replace(/{text}/g, text);
 
     if (Array.isArray(history) && history.length > 0) {
