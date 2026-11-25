@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok AI CRM & Automation Platform | Remates Villa El Salvador</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="view-inbox">
+
+  <!-- OVERLAY Y DRAWER LATERAL MÓVIL (MENÚ HAMBURGUESA) -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <span class="tiktok-badge">♪</span>
+        <div>
+          <h2>TikTok Smart CRM</h2>
+          <span class="sub-badge">Menú de Navegación</span>
+        </div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Cerrar Menú">✕</button>
+    </div>
+    <nav class="drawer-nav">
+      <button class="drawer-item active" data-view="inbox">
+        <span class="drawer-icon">📥</span>
+        <span>Bandeja de Mensajes</span>
+      </button>
+      <button class="drawer-item" data-view="rules">
+        <span class="drawer-icon">⚡</span>
+        <span>Flujos y Palabras Clave</span>
+      </button>
+      <button class="drawer-item" data-view="simulator">
+        <span class="drawer-icon">🧪</span>
+        <span>Simulador de Flujos</span>
+      </button>
+      <button class="drawer-item" data-view="config">
+        <span class="drawer-icon">⚙️</span>
+        <span>Reglas de Negocio</span>
+      </button>
+      <button class="drawer-item" data-view="api">
+        <span class="drawer-icon">📡</span>
+        <span>Integración API</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- BARRA SUPERIOR ENTERPRISE -->
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="hamburger-btn" id="menuToggle" aria-label="Abrir Menú">☰</button>
+      <div class="brand-logo">
+        <span class="tiktok-badge">♪</span>
+        <div>
+          <h1>TikTok Smart CRM</h1>
+          <span class="sub-badge">Sincronización en Tiempo Real</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-account" id="accountBadge">
+      <div class="avatar-circle">R</div>
+      <div class="account-info">
+        <span class="account-name" id="accUsername">@rematesvillaelsalvador</span>
+        <span class="account-sub" id="accFollowers">16.9K seguidores • Conexión Oficial API</span>
+      </div>
+      <span class="status-pill active">En línea</span>
+    </div>
+
+    <div class="nav-right">
+      <div class="toggle-container">
+        <span class="toggle-label">Automatización IA:</span>
+        <label class="switch">
+          <input type="checkbox" id="autoReplyToggle" checked>
+          <span class="slider round"></span>
+        </label>
+        <span class="toggle-status" id="toggleStatusText">ACTIVADA</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="container">
+
+    <!-- GRID DE BANDEJA Y CONFIGURACIÓN -->
+    <div class="main-layout" id="mainLayout">
+      
+      <!-- INBOX UNIFICADO -->
+      <section class="card inbox-card" id="inboxSection">
+
+        <!-- MÉTRICAS (solo visibles en la Bandeja) -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-icon icon-cyan">💬</div>
+            <div class="stat-content">
+              <span class="stat-label">Mensajes e Interacciones</span>
+              <h2 class="stat-val" id="statTotalComments">0</h2>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-magenta">⚡</div>
+            <div class="stat-content">
+              <span class="stat-label">Automatizados por IA</span>
+              <h2 class="stat-val" id="statAiReplies">0</h2>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-purple">👤</div>
+            <div class="stat-content">
+              <span class="stat-label">Atención Manual</span>
+              <h2 class="stat-val" id="statManualReplies">0</h2>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-green">🎯</div>
+            <div class="stat-content">
+              <span class="stat-label">Tasa de Respuesta</span>
+              <h2 class="stat-val" id="statRate">100%</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-header">
+          <div class="header-title">
+            <h3>Bandeja Unificada de TikTok</h3>
+            <span class="live-dot" title="Sincronización en vivo activa"></span>
+          </div>
+          <div class="filter-tabs">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="dms">💬 DMs</button>
+            <button class="filter-btn" data-filter="comments">🎬 Comentarios</button>
+            <button class="filter-btn" style="color: #ef4444;" onclick="clearHistory()">🗑️ Limpiar</button>
+          </div>
+        </div>
+
+        <div class="comments-list" id="commentsList">
+          <div class="empty-state">
+            <span class="empty-icon">📥</span>
+            <p>Esperando interacciones de TikTok...</p>
+            <small>Las nuevas conversaciones y comentarios aparecerán aquí en tiempo real.</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN DERECHA: CONFIGURACIÓN, REGLAS Y SIMULADOR (PANTALLA COMPLETA) -->
+      <section class="right-column" id="rightSection">
+
+        <!-- TAB 1: SIMULADOR -->
+        <div class="tab-content active" id="simulatorTab">
+          <div class="card">
+            <h4>Simulador de Conversión y Flujos IA</h4>
+            <p class="section-desc">Prueba cómo la IA responde instantáneamente a consultas de clientes potenciales antes de interactuar en vivo.</p>
+
+            <form id="simulatorForm" class="form-group">
+              <label>Usuario de prueba:</label>
+              <input type="text" id="simUser" value="cliente_interesado" required>
+
+              <label>Mensaje o Comentario:</label>
+              <textarea id="simText" rows="3" required placeholder="Ej: ¿Hola, cuánto cuesta la lavadora y tienen stock?"></textarea>
+
+              <div class="quick-examples">
+                <span class="quick-title">Ejemplos rápidos:</span>
+                <button type="button" class="btn-chip" onclick="setQuickSim('¿Qué precio tiene la lavadora y aceptan tarjeta?')">💸 Precio y Tarjeta</button>
+                <button type="button" class="btn-chip" onclick="setQuickSim('¿Dónde queda su tienda física en Villa El Salvador?')">📍 Ubicación</button>
+                <button type="button" class="btn-chip" onclick="setQuickSim('¿Hacen envíos a provincia por Shalom?')">🚚 Envíos provincia</button>
+                <button type="button" class="btn-chip" onclick="setQuickSim('la garantia de cuanto tiempo')">🛡️ Garantía</button>
+                <button type="button" class="btn-chip" onclick="setQuickSim('jajaja xd')">😂 Broma (Silencio)</button>
+              </div>
+
+              <button type="submit" class="btn-primary" id="btnSimulate">
+                ⚡ Probar Respuesta Automática
+              </button>
+            </form>
+
+            <div id="simResult" class="sim-result-box" style="display:none;">
+              <span class="badge-success">Respuesta IA generada:</span>
+              <p id="simResultText"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: EDITOR DE REGLAS Y PALABRAS CLAVE (ESTILO MANYCHAT) -->
+        <div class="tab-content" id="rulesEditorTab">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <h4>Editor de Flujos y Palabras Clave</h4>
+                <p class="section-desc">Modifica palabras clave, amplía coincidencias y edita lo que responde el bot al instante.</p>
+              </div>
+            </div>
+
+            <!-- FILTRO DE SILENCIO -->
+            <div class="rule-box" style="border-left: 3px solid #EF4444;">
+              <div class="rule-box-header">
+                <span class="rule-title" style="color: #F87171;">🔇 Filtro Anti-Spam / Silencio Total</span>
+                <span class="rule-pill" style="color: #F87171; background: rgba(239,68,68,0.15);">No Responde</span>
+              </div>
+              <span class="rule-label">Si el comentario contiene alguna de estas palabras o risas, el bot NO responderá nada:</span>
+              <textarea id="rulesSilenceKeywords" class="rule-textarea" rows="2" placeholder="jajaja, xd, meme, troll, humor..."></textarea>
+            </div>
+
+            <!-- SECCIÓN COMENTARIOS EN VIDEOS -->
+            <div class="section-subtitle">🎬 Respuestas para Comentarios en Videos</div>
+            <div id="commentsRulesList" class="rules-container">
+              <!-- Renderizado dinámicamente por app.js -->
+            </div>
+
+            <!-- SECCIÓN MENSAJES DIRECTOS (DMs) -->
+            <div class="section-subtitle" style="margin-top: 1.5rem;">💬 Respuestas para Mensajes Directos (DMs)</div>
+            <div id="dmsRulesList" class="rules-container">
+              <!-- Renderizado dinámicamente por app.js -->
+            </div>
+
+            <!-- FALLBACK DE CIERRE DM -->
+            <div class="rule-box" style="border-left: 3px solid var(--tiktok-cyan); margin-top: 1rem;">
+              <div class="rule-box-header">
+                <span class="rule-title">🎯 Cierre Definitivo a WhatsApp (Cuando la IA no entiende)</span>
+                <span class="rule-pill pill-wa">+ WhatsApp 994516143</span>
+              </div>
+              <span class="rule-label">Mensaje para guiar al cliente cuando pregunte algo fuera de catálogo:</span>
+              <textarea id="rulesFallbackMessage" class="rule-textarea" rows="2"></textarea>
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+              <button type="button" class="btn-primary" onclick="saveAllRules()">
+                💾 Guardar y Aplicar Reglas al Instante
+              </button>
+              <span id="rulesSaveNotice" class="save-notice"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: CONFIGURACIÓN GENERAL -->
+        <div class="tab-content" id="configTab">
+          <div class="card">
+            <h4>Reglas de Negocio & Catálogo</h4>
+            <p class="section-desc">Información oficial utilizada por el motor de IA para canalizar prospectos hacia el canal de ventas por WhatsApp.</p>
+
+            <form id="configForm" class="form-group">
+              <label>Nombre de la Empresa:</label>
+              <input type="text" id="cfgBusinessName">
+
+              <label>Canal Oficial de WhatsApp:</label>
+              <input type="text" id="cfgWhatsapp">
+
+              <label>Dirección del Local Físico:</label>
+              <input type="text" id="cfgAddress">
+
+              <label>Horarios de Atención:</label>
+              <input type="text" id="cfgHours">
+
+              <label>Política de Entrega / Retiro:</label>
+              <textarea id="cfgDelivery" rows="2"></textarea>
+
+              <label>Métodos de Pago:</label>
+              <input type="text" id="cfgPayments">
+
+              <button type="submit" class="btn-secondary">💾 Guardar Cambios</button>
+              <span id="saveNotice" class="save-notice"></span>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 4: WEBHOOK ZERNIO -->
+        <div class="tab-content" id="webhookTab">
+          <div class="card">
+            <h4>Integración API & Webhooks</h4>
+            <p class="section-desc">Configuración para recibir eventos en tiempo real mediante la infraestructura de Zernio:</p>
+            
+            <div class="webhook-box">
+              <label>Endpoint de recepción de eventos:</label>
+              <div class="copy-field">
+                <input type="text" id="webhookUrlInput" readonly value="http://localhost:3000/webhook">
+                <button type="button" onclick="copyWebhookUrl()" class="btn-chip">Copiar</button>
+              </div>
+            </div>
+
+            <div class="info-alert">
+              <strong>💡 Conexión de Alta Disponibilidad:</strong>
+              <p>El motor sincroniza activamente la API oficial de TikTok. Si deseas recibir notificaciones Push mediante Webhooks, puedes mapear este puerto (<code>3000</code>) con tu dominio o túnel seguro (Cloudflare / ngrok).</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
