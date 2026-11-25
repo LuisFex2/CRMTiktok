@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -185,10 +185,19 @@
         <!-- TAB 2: EDITOR DE REGLAS Y PALABRAS CLAVE (ESTILO MANYCHAT) -->
         <div class="tab-content" id="rulesEditorTab">
           <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
               <div>
-                <h4>Editor de Flujos y Palabras Clave</h4>
-                <p class="section-desc">Modifica palabras clave, amplía coincidencias y edita lo que responde el bot al instante.</p>
+                <h4 style="font-size:1.25rem;">Automatizaciones (Reglas)</h4>
+                <p class="section-desc" style="margin-bottom:0;">Respuestas automáticas por palabras clave exactas. Sin IA, sin tokens.</p>
+              </div>
+              <!-- SWITCH DE AUTOMATIZACIONES (REGLAS) -->
+              <div class="toggle-container" style="background:rgba(234,179,8,0.08);border-color:rgba(234,179,8,0.35);">
+                <span class="toggle-label" style="color:#FBBF24;font-weight:700;">⚡ Automatizaciones:</span>
+                <label class="switch">
+                  <input type="checkbox" id="rulesSwitch" checked>
+                  <span class="slider round"></span>
+                </label>
+                <span class="toggle-status" id="rulesSwitchStatus" style="color:#FBBF24;">ACTIVAS</span>
               </div>
             </div>
 
@@ -242,35 +251,14 @@
                 <p class="section-desc" style="margin-bottom: 0;">Cree y gestione agentes de IA con fuentes de conocimiento y prompt para respuestas automatizadas.</p>
               </div>
 
-              <!-- DOS SWITCHES INDEPENDIENTES -->
-              <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
-
-                <!-- SWITCH 1: AUTOMATIZACIONES (REGLAS) -->
-                <div class="toggle-container" style="background:rgba(234,179,8,0.08);border-color:rgba(234,179,8,0.35);flex:1;min-width:200px;">
-                  <div>
-                    <span class="toggle-label" style="color:#FBBF24;font-weight:700;">⚡ Automatizaciones</span>
-                    <span style="display:block;font-size:0.7rem;color:var(--text-dim);margin-top:1px;">Reglas de palabras clave</span>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="rulesSwitch" checked>
-                    <span class="slider round"></span>
-                  </label>
-                  <span class="toggle-status" id="rulesSwitchStatus" style="color:#FBBF24;">ACTIVAS</span>
-                </div>
-
-                <!-- SWITCH 2: AGENTE IA -->
-                <div class="toggle-container" style="background:rgba(37,244,238,0.08);border-color:rgba(37,244,238,0.35);flex:1;min-width:200px;">
-                  <div>
-                    <span class="toggle-label" style="color:#25F4EE;font-weight:700;">🤖 Agente IA</span>
-                    <span style="display:block;font-size:0.7rem;color:var(--text-dim);margin-top:1px;">Gemini 3.5 Flash</span>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="aiAgentSwitch" checked>
-                    <span class="slider round"></span>
-                  </label>
-                  <span class="toggle-status" id="aiAgentStatusText" style="color:#25F4EE;">ACTIVO</span>
-                </div>
-
+              <!-- SWITCH AGENTE IA -->
+              <div class="toggle-container" style="background:rgba(37,244,238,0.08);border-color:rgba(37,244,238,0.35);">
+                <span class="toggle-label" style="color:#25F4EE;font-weight:700;">🤖 Agente IA (Gemini):</span>
+                <label class="switch">
+                  <input type="checkbox" id="aiAgentSwitch" checked>
+                  <span class="slider round"></span>
+                </label>
+                <span class="toggle-status" id="aiAgentStatusText" style="color:#25F4EE;">ACTIVO</span>
               </div>
             </div>
 
