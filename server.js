@@ -181,11 +181,30 @@ app.post('/api/clear-history', (req, res) => {
   }
 });
 
+function buildDbHistory(conversationId, excludeId = null) {
+  if (!conversationId) return [];
+  const data = DB.read();
+  const thread = (data.comments || [])
+    .filter(c => c.conversationId === conversationId && c.id !== excludeId)
+    .slice(0, 4)
+    .reverse();
+  const history = [];
+  for (const item of thread) {
+    if (item.text) history.push({ role: 'user', text: item.text });
+    if (item.replyText) {
+      const cleanReply = item.replyText.replace(/\s*\n?\[\+\s*Bloque 2:[^\]]*\]/g, '').trim();
+      if (cleanReply) history.push({ role: 'model', text: cleanReply });
+    }
+  }
+  return history;
+}
+
 app.post('/api/reply', async (req, res) => {
   try {
     const { id, text, username = 'usuario', postId, conversationId } = req.body;
     const isDM = !!conversationId || postId === 'dm_thread' || (id && id.startsWith('dm_'));
-    const aiResult = await ai.generateResponse({ text, username, isDM });
+    const history = isDM ? buildDbHistory(conversationId, id) : [];
+    const aiResult = await ai.generateResponse({ text, username, isDM, history });
     const firstMsg = typeof aiResult === 'object' ? aiResult.message : aiResult;
     const followUp = typeof aiResult === 'object' ? aiResult.followUp : null;
 
@@ -334,7 +353,14 @@ async function syncDirectMessages() {
       DB.addComment(incoming);
 
       if (config.autoReplyEnabled) {
-        const aiResult = await ai.generateResponse({ text, username, isDM: true });
+        const history = messages
+          .slice(-7, -1)
+          .map(m => ({
+            role: m.direction === 'incoming' ? 'user' : 'model',
+            text: (m.message || '').trim()
+          }))
+          .filter(h => h.text);
+        const aiResult = await ai.generateResponse({ text, username, isDM: true, history });
         const firstMsg = typeof aiResult === 'object' ? aiResult.message : aiResult;
         const followUp = typeof aiResult === 'object' ? aiResult.followUp : null;
 

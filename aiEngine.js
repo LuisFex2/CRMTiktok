@@ -4,10 +4,19 @@ dotenv.config();
 export class AIEngine {
   constructor(config = {}) {
     this.config = config;
+    this.keyIndex = 0;
   }
 
   updateConfig(newConfig) {
     this.config = { ...this.config, ...newConfig };
+  }
+
+  getApiKeys() {
+    const raw = this.config.geminiApiKey || process.env.GEMINI_API_KEY || '';
+    return String(raw)
+      .split(/[\n,;]+/)
+      .map(k => k.trim())
+      .filter(Boolean);
   }
 
   getOfficialWhatsapp() {
@@ -33,10 +42,10 @@ export class AIEngine {
   // ---------------------------------------------------------------------------
   // 1. EVALUACIÓN INTELIGENTE CON GOOGLE GEMINI (COMPRENDE ERRORES Y SLANG)
   // ---------------------------------------------------------------------------
-  async consultGemini(text, isDM = false) {
+  async consultGemini(text, isDM = false, history = []) {
     if (this.config.aiAgentEnabled === false) return null;
-    const apiKey = this.config.geminiApiKey || process.env.GEMINI_API_KEY;
-    if (!apiKey) return null;
+    const keys = this.getApiKeys();
+    if (keys.length === 0) return null;
 
     const phone = this.getOfficialWhatsapp();
     const address = this.config.businessInfo?.address || 'Av. Velasco Alvarado 718, Villa El Salvador';
@@ -60,33 +69,50 @@ Instrucciones de clasificación y respuesta:
    - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp {whatsapp}.`;
 
     const template = this.config.aiSystemPrompt || defaultPrompt;
-    const systemPrompt = template
+    let systemPrompt = template
       .replace(/{businessName}/g, store)
       .replace(/{address}/g, address)
       .replace(/{whatsapp}/g, phone)
       .replace(/{text}/g, text);
 
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: systemPrompt }] }]
-        })
-      });
-
-      if (!res.ok) return null;
-      const data = await res.json();
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if (!reply || reply.toUpperCase().includes('SILENCIO')) {
-        return null;
-      }
-      return reply;
-    } catch (err) {
-      console.warn('[Gemini AI]', err.message);
-      return null;
+    if (Array.isArray(history) && history.length > 0) {
+      const historyLines = history
+        .map(h => `${h.role === 'user' ? 'Cliente' : 'Tú (asistente)'}: ${h.text}`)
+        .join('\n');
+      systemPrompt += `\n\nHistorial reciente de esta conversación (úsalo para mantener el contexto y no repetir lo que ya dijiste):\n${historyLines}`;
     }
+
+    const startIndex = this.keyIndex % keys.length;
+    this.keyIndex = (startIndex + 1) % keys.length;
+
+    for (let attempt = 0; attempt < keys.length; attempt++) {
+      const apiKey = keys[(startIndex + attempt) % keys.length];
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: systemPrompt }] }]
+          })
+        });
+
+        if (!res.ok) {
+          console.warn(`[Gemini AI] Token #${((startIndex + attempt) % keys.length) + 1} devolvió HTTP ${res.status}, probando siguiente...`);
+          continue;
+        }
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (!reply) return null;
+        if (reply.toUpperCase().includes('SILENCIO')) {
+          return '__SILENCE__';
+        }
+        return reply;
+      } catch (err) {
+        console.warn('[Gemini AI]', err.message);
+      }
+    }
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -121,7 +147,7 @@ Instrucciones de clasificación y respuesta:
     // 2.3 AGENTE DE IA: Solo si el switch de Agente IA está encendido
     if (aiEnabled) {
       const geminiReply = await this.consultGemini(rawText, false);
-      if (geminiReply) {
+      if (geminiReply && geminiReply !== '__SILENCE__') {
         return geminiReply;
       }
     }
@@ -133,7 +159,7 @@ Instrucciones de clasificación y respuesta:
   // ---------------------------------------------------------------------------
   // 3. RESPUESTAS PARA MENSAJES DIRECTOS (DMs PRIVADOS)
   // ---------------------------------------------------------------------------
-  async generateResponse({ text, username, isDM = false }) {
+  async generateResponse({ text, username, isDM = false, history = [] }) {
     if (!isDM) {
       const reply = await this.generateCommentResponse({ text, username });
       return {
@@ -161,7 +187,10 @@ Instrucciones de clasificación y respuesta:
     }
     // 3.2 CONSULTAR AL AGENTE DE IA (Solo si está encendido)
     if (aiEnabled) {
-      const geminiReply = await this.consultGemini(rawText, true);
+      const geminiReply = await this.consultGemini(rawText, true, history);
+      if (geminiReply === '__SILENCE__') {
+        return { message: null, followUp: null };
+      }
       if (geminiReply) {
         return {
           message: geminiReply,

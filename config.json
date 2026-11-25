@@ -1,170 +1,170 @@
 {
-    "businessName":  "Remates Villa El Salvador",
-    "accountId":  "6b045c6eb9e97da7ab40d8a7",
-    "autoReplyEnabled":  false,
-    "aiAgentEnabled":  true,
-    "geminiApiKey":  "",
-    "aiSystemPrompt":  "Eres el asistente oficial de ventas en TikTok de la tienda \"{businessName}\".\nUbicación física: {address}.\nWhatsApp oficial de ventas: {whatsapp}.\nReglas del negocio:\n- Solo atendemos y vendemos en tienda física. NO hacemos envíos ni delivery.\n- Aceptamos tarjeta (con 5% de recargo POS), Yape o transferencia.\n- Productos: electrodomésticos nuevos de exhibición y liquidación con garantía probada (lavadoras, frijider, refrigeradoras, secadoras, cocinas, muebles, televisores).\n\nEl usuario escribió el siguiente mensaje o comentario en TikTok:\n\"{text}\"\n\nInstrucciones estrictas:\n1. Si el comentario es un meme, risas (jajaja, xd, 😂), crítica vacía, broma o NO tiene ninguna intención de compra o consulta sobre productos/tienda, responde ÚNICAMENTE la palabra: SILENCIO\n2. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos como \u0027stok\u0027, \u0027keda\u0027, \u0027frijider\u0027, \u0027a cuanto\u0027, \u0027disponivle\u0027, \u0027hay\u0027):\n   - Responde amablemente en 1 o máximo 2 oraciones directas, cordiales y comerciales invitando a escribir al WhatsApp {whatsapp} para pasarle fotos reales de los modelos disponibles en tienda.\n   - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp {whatsapp}.",
-    "businessInfo":  {
-                         "whatsapp":  "994 516 143",
-                         "address":  "Av. Velasco Alvarado 718, Villa El Salvador",
-                         "openingHours":  "Lunes a Sábado de 9:00 am a 8:00 pm. Domingos de 10:00 am a 7:00 pm.",
-                         "delivery":  "Solo tienda física en Villa El Salvador. No hacemos envíos ni delivery.",
-                         "cardPayment":  "Aceptamos tarjeta con 5% de recargo por uso de POS."
-                     },
-    "templates":  {
-                      "Ubicación":  [
-                                         "Estamos en Av. Velasco Alvarado 718, Villa El Salvador. Atendemos de Lunes a Sábado de 9am a 8pm 📍",
-                                         "La tienda física queda en Av. Velasco Alvarado 718 – Villa El Salvador 🙌"
-                                     ],
-                      "Disponible":  [
-                                         "¡Sí! Tenemos stock disponible para retiro inmediato en tienda 🙌",
-                                         "¡Disponible! Puedes pasar a recogerlo en nuestro local de Villa El Salvador 🏬"
-                                     ],
-                      "Agotado":  [
-                                      "Ese producto se nos agotó por el momento. Avísanos si buscas alguna otra alternativa disponible 🙌",
-                                      "Por ahora está agotado ese modelo. Apenas ingrese nuevo lote te avisamos."
-                                  ],
-                      "Tarjeta":  [
-                                      "Sí aceptamos tarjeta de crédito o débito con recargo del 5% por uso de POS 💳",
-                                      "Aceptamos tarjetas con el 5% adicional del POS, y también Yape o transferencia."
-                                  ],
-                      "Envíos":  [
-                                      "Solo atendemos en tienda física en Villa El Salvador. Si gustas puedes mandar a un familiar o alguien de confianza a recoger tu compra 🏬",
-                                      "Por seguridad la venta y retiro es únicamente en nuestra tienda física de Villa El Salvador."
-                                  ],
-                      "Catalogo":  [
-                                       "No manejamos catálogo fijo porque el stock rota a diario. Dime qué producto buscas y te indico los modelos disponibles 🙌",
-                                       "No tenemos catálogo en línea fijo. Indícame qué electrodoméstico necesitas y te oriento con gusto."
-                                   ]
-                  },
-    "rules":  {
-                  "silenceKeywords":  "jajaja, jeje, jaja, jjsjs, xd, 😂, 🤣, funan, grande, bolsillo, chiste, meme, troll, ridiculo, payaso, estafa, humor, buen video, saludos",
-                  "comments":  [
-                                   {
-                                       "id":  "cm_contact",
-                                       "title":  "Contacto / Pedido de WhatsApp",
-                                       "keywords":  "número de contacto, contacto por favor, pásame tu whatsapp, tu número, dame tu número, whatsapp por favor, su wsp",
-                                       "response":  "¡Hola! Escríbenos directo al WhatsApp 👉 994 516 143 y te atendemos al instante 🙌"
-                                   },
-                                   {
-                                       "id":  "cm_warranty",
-                                       "title":  "Garantía",
-                                       "keywords":  "garantía, garantia, tiempo de garantía, tiempo de garantia, cuánto tiempo de garantía",
-                                       "response":  "¡Hola! Sí, todos nuestros productos salen probados y cuentan con garantía. Además tenemos más modelos disponibles 🙌 Escríbenos al WhatsApp 👉 994 516 143 y te damos toda la información 📲"
-                                   },
-                                   {
-                                       "id":  "cm_condition",
-                                       "title":  "Condición (Nuevos / Segunda)",
-                                       "keywords":  "de segunda, segunda mano, usado, usada, reacondicionado, son nuevos, es nuevo, es nueva",
-                                       "response":  "¡Hola! Son electrodomésticos nuevos de exhibición y liquidación con garantía 🙌 Escríbenos al WhatsApp 👉 994 516 143 para pasarte fotos reales 📲"
-                                   },
-                                   {
-                                       "id":  "cm_location",
-                                       "title":  "Ubicación / Dirección de Tienda",
-                                       "keywords":  "donde, dónde, ubicad, ubicación, ubicacion, dirección, direccion, llegar, tienda física, local, av., avenida, lugar, queda",
-                                       "response":  "Estamos en Av. Velasco Alvarado 718, Villa El Salvador 📍 Escríbenos al WhatsApp 👉 994 516 143 y te pasamos la ubicación exacta 🙌"
-                                   },
-                                   {
-                                       "id":  "cm_delivery",
-                                       "title":  "Envíos / Delivery / Provincias",
-                                       "keywords":  "envío, envio, delivery, provincia, llega a, shalom, olva, mandan a, courier, llevan, hacen envio, chimbote, trujillo, arequipa, piura, chiclayo, cusco, huancayo, ica, tacna, juliaca, puno",
-                                       "response":  "¡Hola! Por seguridad solo vendemos en tienda física en Villa El Salvador 🏬 Puedes venir o mandar a alguien de tu confianza 🙌"
-                                   },
-                                   {
-                                       "id":  "cm_payment",
-                                       "title":  "Medios de Pago / Tarjetas",
-                                       "keywords":  "tarjeta, crédito, credito, débito, debito, pos, visa, yape, plin",
-                                       "response":  "¡Hola! Sí aceptamos tarjeta con recargo del 5% por POS, y también Yape o transferencia 💳 WhatsApp 👉 994 516 143 🙌"
-                                   },
-                                   {
-                                       "id":  "cm_hours",
-                                       "title":  "Horarios de Atención",
-                                       "keywords":  "horario, hora, atienden, abren, cierran",
-                                       "response":  "Atendemos de Lunes a Sábado de 9am a 8pm y Domingos de 10am a 6pm en Av. Velasco Alvarado 718, Villa El Salvador ⏰ WhatsApp 👉 994 516 143 🙌"
-                                   },
-                                   {
-                                       "id":  "cm_price",
-                                       "title":  "Precios y Ofertas",
-                                       "keywords":  "precio, cuánto cuesta, cuanto cuesta, cuánto está, cuanto esta, cuánto vale, a cuánto, a cuanto, qué precio, costo, valor",
-                                       "response":  "¡Hola! Sí tenemos en stock para entrega inmediata 🔥 Escríbenos al WhatsApp 👉 994 516 143 y te paso fotos reales y precios disponibles 📲"
-                                   },
-                                   {
-                                       "id":  "cm_stock",
-                                       "title":  "Productos / Modelos / Stock",
-                                       "keywords":  "lavadora, lavadoras, secadora, secadoras, lavaseca, frijider, frigider, refrigerador, refrigeradora, refri, tefri, side by side, toc toc, cuatro puertas, dos puertas, cocina, cocinas, mueble, cama, ropero, televisor, tv, disponible, stock, queda unidad, hay disponible, tienen stock, lg, samsung, mabe, indurama, electrolux",
-                                       "response":  "¡Hola! Sí contamos con stock listo en tienda 🙌 Escríbenos al WhatsApp 👉 994 516 143 para pasarte los modelos en exhibición y precios 📲"
-                                   }
-                               ],
-                  "dms":  [
-                              {
-                                  "id":  "dm_products",
-                                  "title":  "Productos / Frijider / Lavadoras / Modelos (2 Bloques)",
-                                  "keywords":  "lavadora, lavadoras, secadora, secadoras, lavaseca, frijider, frigider, refrigerador, refrigeradora, refri, tefri, side by side, toc toc, cuatro puertas, dos puertas, cocina, cocinas, mueble, muebles, cama, camas, ropero, roperos, colchon, colchones, televisor, tv, electrodomestico, electrodoméstico, lg, samsung, mabe, indurama, electrolux",
-                                  "message":  "¡Sí tenemos en stock para entrega inmediata! Escríbeme al WhatsApp y te paso fotos de los modelos y precios 🙌",
-                                  "sendWhatsappBubble":  true
-                              },
-                              {
-                                  "id":  "dm_delivery",
-                                  "title":  "Envíos y Provincias (2 Bloques)",
-                                  "keywords":  "envio, envío, delivery, provincia, llega a, shalom, olva, mandan a, courier, llevan, hacen envio, chimbote, trujillo, arequipa, piura, chiclayo, cusco, huancayo, ica, tacna, juliaca, puno",
-                                  "message":  "Solo atendemos y entregamos en tienda física en Villa El Salvador. Si tienes a alguien de confianza en Lima para recogerlo, escríbenos al WhatsApp y coordinamos 🙌",
-                                  "sendWhatsappBubble":  true
-                              },
-                              {
-                                  "id":  "dm_prices",
-                                  "title":  "Precios y Stock en DM (2 Bloques)",
-                                  "keywords":  "precio, cuanto, cuánto, costo, vale, disponible, stock, queda, hay, tienen",
-                                  "message":  "¡Sí, disponible en tienda! Escríbeme al WhatsApp y te paso fotos y precios de remate 📲",
-                                  "sendWhatsappBubble":  true
-                              },
-                              {
-                                  "id":  "dm_catalog",
-                                  "title":  "Catálogo / Fotos (2 Bloques)",
-                                  "keywords":  "catalogo, catálogo, catalago, modelos, fotos, que tienes, qué tienes, lista de precio, que vende, qué vende",
-                                  "message":  "No manejamos catálogo fijo porque el stock rota a diario. Dime qué buscas y te envío fotos y precios por WhatsApp 🙌",
-                                  "sendWhatsappBubble":  true
-                              },
-                              {
-                                  "id":  "dm_contact",
-                                  "title":  "Contacto / Pedido de WhatsApp (2 Bloques)",
-                                  "keywords":  "whatsapp, wsp, wasap, numero, número, telefono, teléfono, contacto",
-                                  "message":  "Claro, puedes escribirnos al WhatsApp para coordinar de inmediato 📲",
-                                  "sendWhatsappBubble":  true
-                              },
-                              {
-                                  "id":  "dm_location",
-                                  "title":  "Ubicación en DM (1 Bloque)",
-                                  "keywords":  "donde, dónde, ubicad, ubicacion, ubicación, direccion, dirección, llegar, tienda física, local, av., avenida, lugar",
-                                  "message":  "Estamos en Av. Velasco Alvarado 718, Villa El Salvador. Atendemos de Lunes a Sábado de 9am a 8pm 📍",
-                                  "sendWhatsappBubble":  false
-                              },
-                              {
-                                  "id":  "dm_payments",
-                                  "title":  "Tarjetas y Pagos en DM (1 Bloque)",
-                                  "keywords":  "tarjeta, crédito, credito, débito, debito, pos, visa, mastercard, yape, plin",
-                                  "message":  "Sí aceptamos tarjeta con recargo del 5% por POS, y también pagos con Yape o transferencia 💳",
-                                  "sendWhatsappBubble":  false
-                              },
-                              {
-                                  "id":  "dm_warranty",
-                                  "title":  "Garantía en DM (1 Bloque)",
-                                  "keywords":  "garantía, garantia, tiempo de garantia, tiempo de garantía",
-                                  "message":  "¡Claro que sí! Todos nuestros productos salen probados y cuentan con garantía. Además contamos con más modelos disponibles en stock 🙌",
-                                  "sendWhatsappBubble":  false
-                              },
-                              {
-                                  "id":  "dm_thanks",
-                                  "title":  "Agradecimientos en DM (1 Bloque)",
-                                  "keywords":  "gracias, muchas gracias, ok, dale, listo, chevere, chévere, vale, ya voy, bueno, perfecto, genial, entendido",
-                                  "message":  "¡A ti! Te esperamos en tienda 🙌",
-                                  "sendWhatsappBubble":  false
-                              }
-                          ],
-                  "fallback":  {
-                                   "message":  "Para una atención personalizada y pasarte fotos y precios exactos, por favor escríbenos al WhatsApp o llámanos 🙌",
-                                   "sendWhatsappBubble":  true
-                               }
-              },
-    "rulesEnabled":  true
+  "businessName": "Remates Villa El Salvador",
+  "accountId": "6b045c6eb9e97da7ab40d8a7",
+  "autoReplyEnabled": false,
+  "aiAgentEnabled": true,
+  "geminiApiKey": "",
+  "aiSystemPrompt": "Eres el asistente oficial de ventas en TikTok de la tienda \"{businessName}\".\nUbicación física: {address}.\nWhatsApp oficial de ventas: {whatsapp}.\nReglas del negocio:\n- Solo atendemos y vendemos en tienda física. NO hacemos envíos ni delivery.\n- Aceptamos tarjeta (con 5% de recargo POS), Yape o transferencia.\n- Productos: electrodomésticos nuevos de exhibición y liquidación con garantía probada (lavadoras, frijider, refrigeradoras, secadoras, cocinas, muebles, televisores).\n\nEl usuario escribió el siguiente mensaje o comentario en TikTok:\n\"{text}\"\n\nInstrucciones estrictas:\n1. Si el comentario es un meme, risas (jajaja, xd, 😂), crítica vacía, broma o NO tiene ninguna intención de compra o consulta sobre productos/tienda, responde ÚNICAMENTE la palabra: SILENCIO\n2. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos como 'stok', 'keda', 'frijider', 'a cuanto', 'disponivle', 'hay'):\n   - Responde amablemente en 1 o máximo 2 oraciones directas, cordiales y comerciales invitando a escribir al WhatsApp {whatsapp} para pasarle fotos reales de los modelos disponibles en tienda.\n   - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp {whatsapp}.",
+  "businessInfo": {
+    "whatsapp": "994 516 143",
+    "address": "Av. Velasco Alvarado 718, Villa El Salvador",
+    "openingHours": "Lunes a Sábado de 9:00 am a 8:00 pm. Domingos de 10:00 am a 7:00 pm.",
+    "delivery": "Solo tienda física en Villa El Salvador. No hacemos envíos ni delivery.",
+    "cardPayment": "Aceptamos tarjeta con 5% de recargo por uso de POS."
+  },
+  "templates": {
+    "Ubicación": [
+      "Estamos en Av. Velasco Alvarado 718, Villa El Salvador. Atendemos de Lunes a Sábado de 9am a 8pm 📍",
+      "La tienda física queda en Av. Velasco Alvarado 718 – Villa El Salvador 🙌"
+    ],
+    "Disponible": [
+      "¡Sí! Tenemos stock disponible para retiro inmediato en tienda 🙌",
+      "¡Disponible! Puedes pasar a recogerlo en nuestro local de Villa El Salvador 🏬"
+    ],
+    "Agotado": [
+      "Ese producto se nos agotó por el momento. Avísanos si buscas alguna otra alternativa disponible 🙌",
+      "Por ahora está agotado ese modelo. Apenas ingrese nuevo lote te avisamos."
+    ],
+    "Tarjeta": [
+      "Sí aceptamos tarjeta de crédito o débito con recargo del 5% por uso de POS 💳",
+      "Aceptamos tarjetas con el 5% adicional del POS, y también Yape o transferencia."
+    ],
+    "Envíos": [
+      "Solo atendemos en tienda física en Villa El Salvador. Si gustas puedes mandar a un familiar o alguien de confianza a recoger tu compra 🏬",
+      "Por seguridad la venta y retiro es únicamente en nuestra tienda física de Villa El Salvador."
+    ],
+    "Catalogo": [
+      "No manejamos catálogo fijo porque el stock rota a diario. Dime qué producto buscas y te indico los modelos disponibles 🙌",
+      "No tenemos catálogo en línea fijo. Indícame qué electrodoméstico necesitas y te oriento con gusto."
+    ]
+  },
+  "rules": {
+    "silenceKeywords": "jajaja, jeje, jaja, jjsjs, xd, 😂, 🤣, funan, grande, bolsillo, chiste, meme, troll, ridiculo, payaso, estafa, humor, buen video, saludos",
+    "comments": [
+      {
+        "id": "cm_contact",
+        "title": "Contacto / Pedido de WhatsApp",
+        "keywords": "número de contacto, contacto por favor, pásame tu whatsapp, tu número, dame tu número, whatsapp por favor, su wsp",
+        "response": "¡Hola! Escríbenos directo al WhatsApp 👉 994 516 143 y te atendemos al instante 🙌"
+      },
+      {
+        "id": "cm_warranty",
+        "title": "Garantía",
+        "keywords": "garantía, garantia, tiempo de garantía, tiempo de garantia, cuánto tiempo de garantía",
+        "response": "¡Hola! Sí, todos nuestros productos salen probados y cuentan con garantía. Además tenemos más modelos disponibles 🙌 Escríbenos al WhatsApp 👉 994 516 143 y te damos toda la información 📲"
+      },
+      {
+        "id": "cm_condition",
+        "title": "Condición (Nuevos / Segunda)",
+        "keywords": "de segunda, segunda mano, usado, usada, reacondicionado, son nuevos, es nuevo, es nueva",
+        "response": "¡Hola! Son electrodomésticos nuevos de exhibición y liquidación con garantía 🙌 Escríbenos al WhatsApp 👉 994 516 143 para pasarte fotos reales 📲"
+      },
+      {
+        "id": "cm_location",
+        "title": "Ubicación / Dirección de Tienda",
+        "keywords": "donde, dónde, ubicad, ubicación, ubicacion, dirección, direccion, llegar, tienda física, local, av., avenida, lugar, queda",
+        "response": "Estamos en Av. Velasco Alvarado 718, Villa El Salvador 📍 Escríbenos al WhatsApp 👉 994 516 143 y te pasamos la ubicación exacta 🙌"
+      },
+      {
+        "id": "cm_delivery",
+        "title": "Envíos / Delivery / Provincias",
+        "keywords": "envío, envio, delivery, provincia, llega a, shalom, olva, mandan a, courier, llevan, hacen envio, chimbote, trujillo, arequipa, piura, chiclayo, cusco, huancayo, ica, tacna, juliaca, puno",
+        "response": "¡Hola! Por seguridad solo vendemos en tienda física en Villa El Salvador 🏬 Puedes venir o mandar a alguien de tu confianza 🙌"
+      },
+      {
+        "id": "cm_payment",
+        "title": "Medios de Pago / Tarjetas",
+        "keywords": "tarjeta, crédito, credito, débito, debito, pos, visa, yape, plin",
+        "response": "¡Hola! Sí aceptamos tarjeta con recargo del 5% por POS, y también Yape o transferencia 💳 WhatsApp 👉 994 516 143 🙌"
+      },
+      {
+        "id": "cm_hours",
+        "title": "Horarios de Atención",
+        "keywords": "horario, hora, atienden, abren, cierran",
+        "response": "Atendemos de Lunes a Sábado de 9am a 8pm y Domingos de 10am a 6pm en Av. Velasco Alvarado 718, Villa El Salvador ⏰ WhatsApp 👉 994 516 143 🙌"
+      },
+      {
+        "id": "cm_price",
+        "title": "Precios y Ofertas",
+        "keywords": "precio, cuánto cuesta, cuanto cuesta, cuánto está, cuanto esta, cuánto vale, a cuánto, a cuanto, qué precio, costo, valor",
+        "response": "¡Hola! Sí tenemos en stock para entrega inmediata 🔥 Escríbenos al WhatsApp 👉 994 516 143 y te paso fotos reales y precios disponibles 📲"
+      },
+      {
+        "id": "cm_stock",
+        "title": "Productos / Modelos / Stock",
+        "keywords": "lavadora, lavadoras, secadora, secadoras, lavaseca, frijider, frigider, refrigerador, refrigeradora, refri, tefri, side by side, toc toc, cuatro puertas, dos puertas, cocina, cocinas, mueble, cama, ropero, televisor, tv, disponible, stock, queda unidad, hay disponible, tienen stock, lg, samsung, mabe, indurama, electrolux",
+        "response": "¡Hola! Sí contamos con stock listo en tienda 🙌 Escríbenos al WhatsApp 👉 994 516 143 para pasarte los modelos en exhibición y precios 📲"
+      }
+    ],
+    "dms": [
+      {
+        "id": "dm_products",
+        "title": "Productos / Frijider / Lavadoras / Modelos (2 Bloques)",
+        "keywords": "lavadora, lavadoras, secadora, secadoras, lavaseca, frijider, frigider, refrigerador, refrigeradora, refri, tefri, side by side, toc toc, cuatro puertas, dos puertas, cocina, cocinas, mueble, muebles, cama, camas, ropero, roperos, colchon, colchones, televisor, tv, electrodomestico, electrodoméstico, lg, samsung, mabe, indurama, electrolux",
+        "message": "¡Sí tenemos en stock para entrega inmediata! Escríbeme al WhatsApp y te paso fotos de los modelos y precios 🙌",
+        "sendWhatsappBubble": true
+      },
+      {
+        "id": "dm_delivery",
+        "title": "Envíos y Provincias (2 Bloques)",
+        "keywords": "envio, envío, delivery, provincia, llega a, shalom, olva, mandan a, courier, llevan, hacen envio, chimbote, trujillo, arequipa, piura, chiclayo, cusco, huancayo, ica, tacna, juliaca, puno",
+        "message": "Solo atendemos y entregamos en tienda física en Villa El Salvador. Si tienes a alguien de confianza en Lima para recogerlo, escríbenos al WhatsApp y coordinamos 🙌",
+        "sendWhatsappBubble": true
+      },
+      {
+        "id": "dm_prices",
+        "title": "Precios y Stock en DM (2 Bloques)",
+        "keywords": "precio, cuanto, cuánto, costo, vale, disponible, stock, queda, hay, tienen",
+        "message": "¡Sí, disponible en tienda! Escríbeme al WhatsApp y te paso fotos y precios de remate 📲",
+        "sendWhatsappBubble": true
+      },
+      {
+        "id": "dm_catalog",
+        "title": "Catálogo / Fotos (2 Bloques)",
+        "keywords": "catalogo, catálogo, catalago, modelos, fotos, que tienes, qué tienes, lista de precio, que vende, qué vende",
+        "message": "No manejamos catálogo fijo porque el stock rota a diario. Dime qué buscas y te envío fotos y precios por WhatsApp 🙌",
+        "sendWhatsappBubble": true
+      },
+      {
+        "id": "dm_contact",
+        "title": "Contacto / Pedido de WhatsApp (2 Bloques)",
+        "keywords": "whatsapp, wsp, wasap, numero, número, telefono, teléfono, contacto",
+        "message": "Claro, puedes escribirnos al WhatsApp para coordinar de inmediato 📲",
+        "sendWhatsappBubble": true
+      },
+      {
+        "id": "dm_location",
+        "title": "Ubicación en DM (1 Bloque)",
+        "keywords": "donde, dónde, ubicad, ubicacion, ubicación, direccion, dirección, llegar, tienda física, local, av., avenida, lugar",
+        "message": "Estamos en Av. Velasco Alvarado 718, Villa El Salvador. Atendemos de Lunes a Sábado de 9am a 8pm 📍",
+        "sendWhatsappBubble": false
+      },
+      {
+        "id": "dm_payments",
+        "title": "Tarjetas y Pagos en DM (1 Bloque)",
+        "keywords": "tarjeta, crédito, credito, débito, debito, pos, visa, mastercard, yape, plin",
+        "message": "Sí aceptamos tarjeta con recargo del 5% por POS, y también pagos con Yape o transferencia 💳",
+        "sendWhatsappBubble": false
+      },
+      {
+        "id": "dm_warranty",
+        "title": "Garantía en DM (1 Bloque)",
+        "keywords": "garantía, garantia, tiempo de garantia, tiempo de garantía",
+        "message": "¡Claro que sí! Todos nuestros productos salen probados y cuentan con garantía. Además contamos con más modelos disponibles en stock 🙌",
+        "sendWhatsappBubble": false
+      },
+      {
+        "id": "dm_thanks",
+        "title": "Agradecimientos en DM (1 Bloque)",
+        "keywords": "gracias, muchas gracias, ok, dale, listo, chevere, chévere, vale, ya voy, bueno, perfecto, genial, entendido",
+        "message": "¡A ti! Te esperamos en tienda 🙌",
+        "sendWhatsappBubble": false
+      }
+    ],
+    "fallback": {
+      "message": "Para una atención personalizada y pasarte fotos y precios exactos, por favor escríbenos al WhatsApp o llámanos 🙌",
+      "sendWhatsappBubble": true
+    }
+  },
+  "rulesEnabled": true
 }

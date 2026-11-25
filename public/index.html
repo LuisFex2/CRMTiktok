@@ -18,11 +18,13 @@
       <div class="brand-logo">
         <span class="tiktok-badge">♪</span>
         <div>
-          <h2>TikTok Smart CRM</h2>
+          <h2 id="crmTitleDrawer"></h2>
           <span class="sub-badge">Menú de Navegación</span>
         </div>
       </div>
-      <button class="drawer-close" id="drawerClose" aria-label="Cerrar Menú">✕</button>
+      <button class="drawer-close" id="drawerClose" aria-label="Cerrar Menú">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="14" y2="14"/><line x1="14" y1="4" x2="4" y2="14"/></svg>
+      </button>
     </div>
     <nav class="drawer-nav">
       <button class="drawer-item active" data-view="inbox">
@@ -52,32 +54,23 @@
     </nav>
   </aside>
 
-  <!-- BARRA SUPERIOR ENTERPRISE -->
+  <!-- BARRA SUPERIOR COMPACTA -->
   <header class="navbar">
     <div class="nav-left">
       <button class="hamburger-btn" id="menuToggle" aria-label="Abrir Menú">☰</button>
       <div class="brand-logo">
         <span class="tiktok-badge">♪</span>
         <div>
-          <h1>TikTok Smart CRM</h1>
-          <span class="sub-badge">Sincronización en Tiempo Real</span>
+          <h1 id="crmTitle">@rematesvillaelsalvador</h1>
+          <span id="followersBadge" class="sub-badge">17K seguidores</span>
         </div>
       </div>
-    </div>
-
-    <div class="nav-account" id="accountBadge">
-      <div class="avatar-circle">R</div>
-      <div class="account-info">
-        <span class="account-name" id="accUsername">@rematesvillaelsalvador</span>
-        <span class="account-sub" id="accFollowers">16.9K seguidores • Conexión Oficial API</span>
-      </div>
-      <span class="status-pill active">En línea</span>
     </div>
 
     <div class="nav-right">
       <div id="botStatusBadge" style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:999px;background:rgba(16,185,129,0.15);border:1px solid #10B981;color:#10B981;">
         <span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span>
-        <span id="botStatusLabel">Bot Activo</span>
+        <span id="botStatusLabel">CRM ON</span>
       </div>
     </div>
   </header>
@@ -288,8 +281,13 @@
             </div>
 
             <form id="agentSettingsForm" class="form-group">
-              <label>Token / API Key de Google Gemini (Google AI Studio):</label>
-              <input type="text" id="cfgAgentGeminiKey" placeholder="Pega aquí tu clave AQ... o AIzaSy..." style="margin-bottom: 0.5rem;">
+              <label>Token / API Key de Google Gemini (puedes poner varios separados por coma):</label>
+              <div class="secret-input-wrap" style="margin-bottom: 0.5rem;">
+                <input type="password" id="cfgAgentGeminiKey" placeholder="Pega una o varias claves separadas por coma: AIza..., AQ..." autocomplete="off">
+                <button type="button" class="btn-eye" onclick="toggleSecret('cfgAgentGeminiKey', this)" aria-label="Mostrar u ocultar token" title="Mostrar / Ocultar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
 
               <label>Prompt del Agente (Personalidad, Reglas del Negocio y WhatsApp):</label>
               <textarea id="cfgAgentPrompt" rows="9" style="font-family: monospace; font-size: 0.82rem; line-height: 1.45;" placeholder="Instrucciones para la IA..."></textarea>
@@ -352,7 +350,12 @@
               </div>
 
               <label>TikTok Account ID:</label>
-              <input type="text" id="cfgAccountId" value="6b045c6eb9e97da7ab40d8a7" style="margin-top:0.3rem;" readonly>
+              <div class="secret-input-wrap" style="margin-top:0.3rem;">
+                <input type="password" id="cfgAccountId" value="6b045c6eb9e97da7ab40d8a7" readonly>
+                <button type="button" class="btn-eye" onclick="toggleSecret('cfgAccountId', this)" aria-label="Mostrar u ocultar ID" title="Mostrar / Ocultar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
               <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
                 Cuenta vinculada en producción: <strong>@rematesvillaelsalvador</strong> (17.0K seguidores).
               </small>
@@ -362,7 +365,12 @@
             <div class="webhook-box">
               <label>Endpoint de recepción de eventos (Webhooks):</label>
               <div class="copy-field">
-                <input type="text" id="webhookUrlInput" readonly value="http://localhost:3000/webhook">
+                <div class="secret-input-wrap" style="flex:1;">
+                  <input type="password" id="webhookUrlInput" readonly value="http://localhost:3000/webhook">
+                  <button type="button" class="btn-eye" onclick="toggleSecret('webhookUrlInput', this)" aria-label="Mostrar u ocultar endpoint" title="Mostrar / Ocultar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
                 <button type="button" onclick="copyWebhookUrl()" class="btn-chip">Copiar</button>
               </div>
             </div>

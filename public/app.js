@@ -4,26 +4,37 @@ let currentFilter = 'all';
 
 // Elementos DOM
 const commentsList = document.getElementById('commentsList');
-const autoReplyToggle = document.getElementById('autoReplyToggle');
-const toggleStatusText = document.getElementById('toggleStatusText');
 
 const statTotalComments = document.getElementById('statTotalComments');
 const statAiReplies = document.getElementById('statAiReplies');
 const statManualReplies = document.getElementById('statManualReplies');
 const statRate = document.getElementById('statRate');
 
+// ── Función centralizada para actualizar encabezado dinámico ──
+function updateHeaderUI(account) {
+  if (!account) return;
+  const crmTitleEl = document.getElementById('crmTitle');
+  if (crmTitleEl) {
+    crmTitleEl.textContent = '@' + (account.username || 'rematesvillaelsalvador');
+  }
+  const drawerTitleEl = document.getElementById('crmTitleDrawer');
+  if (drawerTitleEl) {
+    drawerTitleEl.textContent = '@' + (account.username || 'rematesvillaelsalvador');
+  }
+  const followersBadge = document.getElementById('followersBadge');
+  if (followersBadge && typeof account.followersCount === 'number') {
+    const k = Math.round(account.followersCount / 1000);
+    followersBadge.textContent = k + 'K seguidores';
+  }
+}
+
 // 1. Cargar Estado Inicial y Status de Conexión
 async function loadStatus() {
   try {
     const res = await fetch('/api/status');
     const data = await res.json();
-    if (data.ok) {
-      if (data.account) {
-        document.getElementById('accUsername').textContent = `@${data.account.username || 'rematesvillaelsalvador'}`;
-        document.getElementById('accFollowers').textContent = `${((data.account.followersCount || 16975) / 1000).toFixed(1)}K seguidores • Conectado`;
-      }
-      if (autoReplyToggle) autoReplyToggle.checked = !!data.autoReplyEnabled;
-      updateToggleLabel(data.autoReplyEnabled);
+    if (data.ok && data.account) {
+      updateHeaderUI(data.account);
     }
   } catch (err) {
     console.warn('Error al cargar status:', err);
@@ -143,34 +154,7 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 3. Toggle de Automatización IA (ya no está en el navbar, pero se conserva por compatibilidad)
-if (autoReplyToggle) {
-  autoReplyToggle.addEventListener('change', async (e) => {
-    const enabled = e.target.checked;
-    updateToggleLabel(enabled);
-    try {
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ autoReplyEnabled: enabled })
-      });
-    } catch (err) {
-      console.error('Error al actualizar autoReply:', err);
-    }
-  });
-}
-
-function updateToggleLabel(enabled) {
-  if (enabled) {
-    toggleStatusText.textContent = 'ACTIVADA';
-    toggleStatusText.style.color = '#10b981';
-  } else {
-    toggleStatusText.textContent = 'PAUSADA';
-    toggleStatusText.style.color = '#ef4444';
-  }
-}
-
-// 4. Filtrado de Inbox
+// 3. Filtrado de Inbox
 document.querySelectorAll('.filter-btn').forEach(btn => {
   if (btn.getAttribute('data-filter')) {
     btn.addEventListener('click', () => {
@@ -309,6 +293,7 @@ async function loadBusinessConfig() {
     if (agentKeyInput) {
       agentKeyInput.value = data.geminiApiKey || '';
     }
+
     const agentPromptInput = document.getElementById('cfgAgentPrompt');
     if (agentPromptInput) {
       agentPromptInput.value = data.aiSystemPrompt || '';
@@ -335,10 +320,10 @@ function updateModeSummary() {
   if (badge && badgeLabel) {
     if (!aiOn && !rulesOn) {
       badge.style.cssText = 'display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:999px;background:rgba(148,163,184,0.1);border:1px solid #475569;color:#94A3B8;';
-      badgeLabel.textContent = 'Bot Silenciado';
+      badgeLabel.textContent = 'CRM OFF';
     } else {
       badge.style.cssText = 'display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:999px;background:rgba(16,185,129,0.15);border:1px solid #10B981;color:#10B981;';
-      badgeLabel.textContent = 'Bot Activo';
+      badgeLabel.textContent = 'CRM ON';
     }
   }
   if (!aiModeNoticeTitle || !aiModeNoticeDesc) return;
@@ -481,9 +466,18 @@ if (configForm) {
 
 function copyWebhookUrl() {
   const copyText = document.getElementById('webhookUrlInput');
-  copyText.select();
   navigator.clipboard.writeText(copyText.value);
   alert('URL copiada al portapapeles');
+}
+
+function toggleSecret(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btn.innerHTML = isHidden
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 }
 
 // Inicialización
@@ -495,7 +489,7 @@ loadBusinessConfig();
 setInterval(loadComments, 5000);
 
 // -------------------------------------------------------------
-// 11. EDITOR DINÁMICO DE REGLAS Y PALABRAS CLAVE (ESTILO MANYCHAT)
+// EDITOR DINÁMICO DE REGLAS Y PALABRAS CLAVE (ESTILO MANYCHAT)
 // -------------------------------------------------------------
 let currentRules = { comments: [], dms: [], silenceKeywords: '', fallback: {} };
 
@@ -633,7 +627,7 @@ async function saveAllRules() {
 loadRules();
 
 // -------------------------------------------------------------
-// 12. MENÚ HAMBURGUESA & NAVEGACIÓN MÓVIL POR VISTAS DIRECTAS
+// MENÚ HAMBURGUESA & NAVEGACIÓN MÓVIL POR VISTAS DIRECTAS
 // -------------------------------------------------------------
 const menuToggle = document.getElementById('menuToggle');
 const mobileDrawer = document.getElementById('mobileDrawer');
@@ -661,9 +655,6 @@ function switchView(viewName) {
   // Actualizar botones de vista activa
   document.querySelectorAll('.drawer-item').forEach(item => {
     item.classList.toggle('active', item.dataset.view === viewName);
-  });
-  document.querySelectorAll('.m-tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.view === viewName);
   });
 
   const tabMapping = {
@@ -698,12 +689,5 @@ function switchView(viewName) {
 document.querySelectorAll('.drawer-item').forEach(item => {
   item.addEventListener('click', () => {
     switchView(item.dataset.view);
-  });
-});
-
-// Eventos en los botones de cápsula de la barra superior
-document.querySelectorAll('.m-tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    switchView(btn.dataset.view);
   });
 });
