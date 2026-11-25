@@ -41,22 +41,29 @@ export class AIEngine {
     const address = this.config.businessInfo?.address || 'Av. Velasco Alvarado 718, Villa El Salvador';
     const store = this.config.businessName || 'Remates Villa El Salvador';
 
-    const systemPrompt = `Eres el asistente oficial de ventas en TikTok de la tienda "${store}".
-Ubicación física: ${address}.
-WhatsApp oficial de ventas: ${phone}.
+    const defaultPrompt = `Eres el asistente oficial de ventas en TikTok de la tienda "{businessName}".
+Ubicación física: {address}.
+WhatsApp oficial de ventas: {whatsapp}.
 Reglas de negocio:
-- Solo atendemos y vendemos en tienda física en Villa El Salvador. NO hacemos envíos ni delivery.
+- Solo atendemos y vendemos en tienda física. NO hacemos envíos ni delivery.
 - Aceptamos tarjeta (con 5% de recargo POS), Yape o transferencia.
-- Productos: electrodomésticos nuevos de exhibición y liquidación con garantía probada (lavadoras, frijider, refrigeradoras, secadoras, cocinas, muebles, televisores).
+- Productos: electrodomésticos nuevos de exhibición y liquidación con garantía probada.
 
 El usuario escribió el siguiente mensaje o comentario en TikTok:
-"${text}"
+"{text}"
 
 Instrucciones de clasificación y respuesta:
 1. Si el comentario es un meme, risas (jajaja, xd, 😂), crítica vacía, broma o NO tiene ninguna intención de compra o consulta sobre productos/tienda, responde ÚNICAMENTE la palabra: SILENCIO
-2. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos peruanos como "stok", "keda", "frijider", "a cuanto", "disponivle", "hay"):
-   - Responde amablemente en 1 o máximo 2 oraciones directas, cordiales y comerciales invitando a escribir al WhatsApp ${phone} para pasarle fotos reales de los modelos disponibles en tienda.
-   - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp ${phone}.`;
+2. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos como "stok", "keda", "frijider", "a cuanto"):
+   - Responde amablemente en 1 o máximo 2 oraciones directas, cordiales y comerciales invitando a escribir al WhatsApp {whatsapp} para pasarle fotos reales de los modelos disponibles.
+   - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp {whatsapp}.`;
+
+    const template = this.config.aiSystemPrompt || defaultPrompt;
+    const systemPrompt = template
+      .replace(/{businessName}/g, store)
+      .replace(/{address}/g, address)
+      .replace(/{whatsapp}/g, phone)
+      .replace(/{text}/g, text);
 
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;

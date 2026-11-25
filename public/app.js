@@ -309,6 +309,10 @@ async function loadBusinessConfig() {
     if (geminiKeyInput) {
       geminiKeyInput.value = data.geminiApiKey || '';
     }
+    const aiPromptInput = document.getElementById('cfgAiPrompt');
+    if (aiPromptInput) {
+      aiPromptInput.value = data.aiSystemPrompt || '';
+    }
   } catch (err) {
     console.warn('Error al cargar config:', err);
   }
@@ -362,7 +366,8 @@ if (apiSettingsForm) {
 
     const payload = {
       replyMode: document.getElementById('cfgReplyMode')?.value || 'hybrid',
-      geminiApiKey: document.getElementById('cfgGeminiKey')?.value.trim() || ''
+      geminiApiKey: document.getElementById('cfgGeminiKey')?.value.trim() || '',
+      aiSystemPrompt: document.getElementById('cfgAiPrompt')?.value || ''
     };
 
     try {
