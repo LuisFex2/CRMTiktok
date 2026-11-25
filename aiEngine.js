@@ -31,13 +31,64 @@ export class AIEngine {
   }
 
   // ---------------------------------------------------------------------------
-  // 1. RESPUESTAS PARA COMENTARIOS PÚBLICOS EN VIDEOS
+  // 1. EVALUACIÓN INTELIGENTE CON GOOGLE GEMINI (COMPRENDE ERRORES Y SLANG)
   // ---------------------------------------------------------------------------
-  generateCommentResponse({ text }) {
+  async consultGemini(text, isDM = false) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+
+    const phone = this.getOfficialWhatsapp();
+    const address = this.config.businessInfo?.address || 'Av. Velasco Alvarado 718, Villa El Salvador';
+    const store = this.config.businessName || 'Remates Villa El Salvador';
+
+    const systemPrompt = `Eres el asistente oficial de ventas en TikTok de la tienda "${store}".
+Ubicación física: ${address}.
+WhatsApp oficial de ventas: ${phone}.
+Reglas de negocio:
+- Solo atendemos y vendemos en tienda física en Villa El Salvador. NO hacemos envíos ni delivery.
+- Aceptamos tarjeta (con 5% de recargo POS), Yape o transferencia.
+- Productos: electrodomésticos nuevos de exhibición y liquidación con garantía probada (lavadoras, frijider, refrigeradoras, secadoras, cocinas, muebles, televisores).
+
+El usuario escribió el siguiente mensaje o comentario en TikTok:
+"${text}"
+
+Instrucciones de clasificación y respuesta:
+1. Si el comentario es un meme, risas (jajaja, xd, 😂), crítica vacía, broma o NO tiene ninguna intención de compra o consulta sobre productos/tienda, responde ÚNICAMENTE la palabra: SILENCIO
+2. Si el usuario tiene intención de compra, consulta de modelos, stock, precios, marcas (incluso con faltas de ortografía o modismos peruanos como "stok", "keda", "frijider", "a cuanto", "disponivle", "hay"):
+   - Responde amablemente en 1 o máximo 2 oraciones directas, cordiales y comerciales invitando a escribir al WhatsApp ${phone} para pasarle fotos reales de los modelos disponibles en tienda.
+   - En comentarios públicos NUNCA incluyas enlaces web (URLs), solo menciona el WhatsApp ${phone}.`;
+
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: systemPrompt }] }]
+        })
+      });
+
+      if (!res.ok) return null;
+      const data = await res.json();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (!reply || reply.toUpperCase().includes('SILENCIO')) {
+        return null;
+      }
+      return reply;
+    } catch (err) {
+      console.warn('[Gemini AI]', err.message);
+      return null;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 2. RESPUESTAS PARA COMENTARIOS PÚBLICOS EN VIDEOS
+  // ---------------------------------------------------------------------------
+  async generateCommentResponse({ text }) {
     const rawText = (text || '').trim();
     const rules = this.config.rules || {};
 
-    // 1.1 FILTRO DE SILENCIO (BROMAS, RISAS, MEMES) -> NO RESPONDER
+    // 2.1 FILTRO RÁPIDO DE SILENCIO (BROMAS, RISAS, MEMES) -> NO RESPONDER
     if (this.matchesKeywords(rawText, rules.silenceKeywords)) {
       return null;
     }
@@ -48,7 +99,7 @@ export class AIEngine {
       return null;
     }
 
-    // 1.2 REGLAS DINÁMICAS DE COMENTARIOS
+    // 2.2 REGLAS DINÁMICAS DIRECTAS DEL CRM
     const commentRules = rules.comments || [];
     for (const rule of commentRules) {
       if (this.matchesKeywords(rawText, rule.keywords)) {
@@ -56,16 +107,22 @@ export class AIEngine {
       }
     }
 
+    // 2.3 CEREBRO IA GEMINI: Para faltas ortográficas ("stok", "keda"), preguntas abiertas o modismos
+    const geminiReply = await this.consultGemini(rawText, false);
+    if (geminiReply) {
+      return geminiReply;
+    }
+
     // Si no coincide con ninguna intención comercial -> Silencio total
     return null;
   }
 
   // ---------------------------------------------------------------------------
-  // 2. RESPUESTAS PARA MENSAJES DIRECTOS (DMs PRIVADOS)
+  // 3. RESPUESTAS PARA MENSAJES DIRECTOS (DMs PRIVADOS)
   // ---------------------------------------------------------------------------
   async generateResponse({ text, username, isDM = false }) {
     if (!isDM) {
-      const reply = this.generateCommentResponse({ text, username });
+      const reply = await this.generateCommentResponse({ text, username });
       return {
         message: reply,
         followUp: null
@@ -76,7 +133,7 @@ export class AIEngine {
     const rules = this.config.rules || {};
     const dmRules = rules.dms || [];
 
-    // 2.1 EVALUAR REGLAS DINÁMICAS DE DM
+    // 3.1 EVALUAR REGLAS DINÁMICAS DE DM
     for (const rule of dmRules) {
       if (this.matchesKeywords(rawText, rule.keywords)) {
         return {
@@ -86,7 +143,16 @@ export class AIEngine {
       }
     }
 
-    // 2.2 FALLBACK DE CIERRE DIRECTO A WHATSAPP
+    // 3.2 CONSULTAR A GEMINI SI HAY PREGUNTA ABIERTA O CON FALTAS ORTOGRÁFICAS
+    const geminiReply = await this.consultGemini(rawText, true);
+    if (geminiReply) {
+      return {
+        message: geminiReply,
+        followUp: this.getOfficialWhatsapp()
+      };
+    }
+
+    // 3.3 FALLBACK DE CIERRE DIRECTO A WHATSAPP
     const fallback = rules.fallback || {
       message: "Para una atención personalizada y pasarte fotos y precios exactos, por favor escríbenos al WhatsApp o llámanos 🙌",
       sendWhatsappBubble: true

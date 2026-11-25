@@ -406,9 +406,9 @@ async function syncVideoComments() {
         const username = cm.from?.username || cm.from?.name || 'usuario';
         const commentText = cm.message || '';
 
-        // 1. REGLA HUMANA: Clasificación de intención.
+        // 1. REGLA HUMANA + IA: Clasificación de intención.
         // Si es broma, meme, risas o no es consulta comercial -> Se ignora y NO se responde.
-        const replyText = ai.generateCommentResponse({ text: commentText, username });
+        const replyText = await ai.generateCommentResponse({ text: commentText, username });
         if (!replyText) {
           console.log(`[TikTok Comentario Ignorado - Sin Intención Comercial] @${username}: "${commentText}"`);
           processedKeys.add(key);
