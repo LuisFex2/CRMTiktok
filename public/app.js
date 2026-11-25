@@ -315,39 +315,78 @@ async function loadBusinessConfig() {
 }
 
 const configForm = document.getElementById('configForm');
-configForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const saveNotice = document.getElementById('saveNotice');
-  saveNotice.textContent = 'Guardando...';
+if (configForm) {
+  configForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveNotice = document.getElementById('saveNotice');
+    saveNotice.textContent = 'Guardando...';
 
-  const payload = {
-    businessName: document.getElementById('cfgBusinessName').value,
-    replyMode: document.getElementById('cfgReplyMode')?.value || 'hybrid',
-    geminiApiKey: document.getElementById('cfgGeminiKey')?.value.trim() || '',
-    businessInfo: {
-      whatsapp: document.getElementById('cfgWhatsapp').value,
-      address: document.getElementById('cfgAddress').value,
-      openingHours: document.getElementById('cfgHours').value,
-      delivery: document.getElementById('cfgDelivery').value,
-      cardPayment: document.getElementById('cfgPayments').value
-    }
-  };
+    const payload = {
+      businessName: document.getElementById('cfgBusinessName').value,
+      businessInfo: {
+        whatsapp: document.getElementById('cfgWhatsapp').value,
+        address: document.getElementById('cfgAddress').value,
+        openingHours: document.getElementById('cfgHours').value,
+        delivery: document.getElementById('cfgDelivery').value,
+        cardPayment: document.getElementById('cfgPayments').value
+      }
+    };
 
-  try {
-    const res = await fetch('/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (data.ok) {
-      saveNotice.textContent = '✅ Guardado con éxito';
-      setTimeout(() => { saveNotice.textContent = ''; }, 3000);
+    try {
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        saveNotice.textContent = '✅ Datos de tienda guardados con éxito';
+        setTimeout(() => { saveNotice.textContent = ''; }, 3000);
+      }
+    } catch (err) {
+      saveNotice.textContent = '❌ Error al guardar';
     }
-  } catch (err) {
-    saveNotice.textContent = '❌ Error al guardar';
-  }
-});
+  });
+}
+
+// 11. Formulario de Integración API & Tokens
+const apiSettingsForm = document.getElementById('apiSettingsForm');
+if (apiSettingsForm) {
+  apiSettingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const notice = document.getElementById('apiSaveNotice');
+    if (notice) {
+      notice.textContent = 'Guardando...';
+      notice.style.color = '#F59E0B';
+    }
+
+    const payload = {
+      replyMode: document.getElementById('cfgReplyMode')?.value || 'hybrid',
+      geminiApiKey: document.getElementById('cfgGeminiKey')?.value.trim() || ''
+    };
+
+    try {
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        if (notice) {
+          notice.textContent = '✅ Token y Modo de IA guardados con éxito';
+          notice.style.color = '#10B981';
+          setTimeout(() => { notice.textContent = ''; }, 3500);
+        }
+      }
+    } catch (err) {
+      if (notice) {
+        notice.textContent = '❌ Error al guardar';
+        notice.style.color = '#EF4444';
+      }
+    }
+  });
+}
 
 function copyWebhookUrl() {
   const copyText = document.getElementById('webhookUrlInput');

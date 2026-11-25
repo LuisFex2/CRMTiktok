@@ -233,7 +233,7 @@
           </div>
         </div>
 
-        <!-- TAB 3: CONFIGURACIÓN GENERAL -->
+        <!-- TAB 3: CONFIGURACIÓN GENERAL / REGLAS DE NEGOCIO -->
         <div class="tab-content" id="configTab">
           <div class="card">
             <h4>Reglas de Negocio & Catálogo</h4>
@@ -258,41 +258,65 @@
               <label>Métodos de Pago:</label>
               <input type="text" id="cfgPayments">
 
-              <!-- CONFIGURACIÓN DE IA Y TOKEN -->
-              <div class="rule-box" style="border-left: 3px solid var(--tiktok-cyan); margin: 0.8rem 0; padding: 1rem; background: rgba(0,0,0,0.3);">
-                <div class="rule-box-header" style="margin-bottom: 0.6rem;">
-                  <span class="rule-title">🧠 Modo de Respuestas del Bot</span>
-                  <span class="rule-pill pill-wa">Control Inteligente</span>
-                </div>
-                
-                <label>Selecciona cómo debe responder el CRM:</label>
-                <select id="cfgReplyMode" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:0.65rem; color:#fff; font-size:0.85rem; margin-top:0.3rem; margin-bottom:0.8rem;">
-                  <option value="hybrid">🟢 Híbrido Inteligente (Reglas fijas + IA rescata faltas ortográficas)</option>
-                  <option value="rules_only">⚡ Solo Reglas y Palabras Clave (Sin IA - Cero consumo de tokens)</option>
-                  <option value="gemini_only">🧠 Solo Inteligencia Artificial (Gemini analiza y responde todo)</option>
-                </select>
-
-                <label>Token / Clave de API de Gemini (Google AI Studio):</label>
-                <input type="text" id="cfgGeminiKey" placeholder="Pega aquí tu clave AQ... o AIzaSy..." style="margin-top:0.3rem;">
-                <small style="color:var(--text-dim); font-size:0.73rem; display:block; margin-top:0.35rem;">
-                  💡 Puedes cambiar o renovar tu Token aquí directamente sin tocar código.
-                </small>
-              </div>
-
-              <button type="submit" class="btn-secondary">💾 Guardar Cambios</button>
+              <button type="submit" class="btn-secondary">💾 Guardar Cambios de Tienda</button>
               <span id="saveNotice" class="save-notice"></span>
             </form>
           </div>
         </div>
 
-        <!-- TAB 4: WEBHOOK API -->
+        <!-- TAB 4: INTEGRACIÓN API & TOKENS -->
         <div class="tab-content" id="webhookTab">
           <div class="card">
-            <h4>Integración API & Webhooks</h4>
-            <p class="section-desc">Configuración para recibir eventos en tiempo real mediante la infraestructura de la API:</p>
-            
+            <h4>Integración API & Inteligencia Artificial</h4>
+            <p class="section-desc">Gestiona tus claves de acceso, selecciona el modo de respuestas y conecta servicios externos sin tocar código:</p>
+
+            <form id="apiSettingsForm" class="form-group">
+              <!-- SECCIÓN 1: INTELIGENCIA ARTIFICIAL GEMINI -->
+              <div class="rule-box" style="border-left: 3px solid var(--tiktok-cyan); margin-bottom: 1.25rem;">
+                <div class="rule-box-header">
+                  <span class="rule-title">🧠 Motor de Inteligencia Artificial (Google Gemini)</span>
+                  <span class="rule-pill pill-wa">Control Inteligente</span>
+                </div>
+
+                <label>Modo de Respuesta del Bot:</label>
+                <select id="cfgReplyMode" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:0.65rem; color:#fff; font-size:0.85rem; margin-top:0.3rem; margin-bottom:0.85rem;">
+                  <option value="hybrid">🟢 Híbrido Inteligente (Reglas fijas + IA rescata faltas ortográficas)</option>
+                  <option value="rules_only">⚡ Solo Reglas y Palabras Clave (Sin IA - Cero consumo de tokens)</option>
+                  <option value="gemini_only">🧠 Solo Inteligencia Artificial (Gemini analiza y responde todo)</option>
+                </select>
+
+                <label>Token / API Key de Gemini (Google AI Studio):</label>
+                <input type="text" id="cfgGeminiKey" placeholder="Pega aquí tu clave AQ... o AIzaSy..." style="margin-top:0.3rem;">
+                <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
+                  💡 Puedes cambiar o renovar tu Token aquí en cualquier momento sin tocar el código.
+                </small>
+              </div>
+
+              <!-- SECCIÓN 2: CONEXIÓN TIKTOK -->
+              <div class="rule-box" style="border-left: 3px solid var(--tiktok-red); margin-bottom: 1.25rem;">
+                <div class="rule-box-header">
+                  <span class="rule-title">🎵 Conexión Oficial TikTok</span>
+                  <span class="rule-pill" style="color:var(--tiktok-red);">API Activa</span>
+                </div>
+
+                <label>TikTok Account ID:</label>
+                <input type="text" id="cfgAccountId" value="6b045c6eb9e97da7ab40d8a7" style="margin-top:0.3rem;" readonly>
+                <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.35rem;">
+                  Identificador oficial de la cuenta vinculada: <strong>@rematesvillaelsalvador</strong>.
+                </small>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem;">
+                <button type="submit" class="btn-primary">
+                  💾 Guardar Configuración de APIs y Token
+                </button>
+                <span id="apiSaveNotice" class="save-notice"></span>
+              </div>
+            </form>
+
+            <!-- SECCIÓN 3: WEBHOOKS -->
             <div class="webhook-box">
-              <label>Endpoint de recepción de eventos:</label>
+              <label>Endpoint de recepción de eventos (Webhooks):</label>
               <div class="copy-field">
                 <input type="text" id="webhookUrlInput" readonly value="http://localhost:3000/webhook">
                 <button type="button" onclick="copyWebhookUrl()" class="btn-chip">Copiar</button>
