@@ -181,6 +181,10 @@ app.post('/api/clear-history', (req, res) => {
   }
 });
 
+function isBotEnabled() {
+  return config.aiAgentEnabled !== false || config.rulesEnabled !== false;
+}
+
 function buildDbHistory(conversationId, excludeId = null) {
   if (!conversationId) return [];
   const data = DB.read();
@@ -352,7 +356,7 @@ async function syncDirectMessages() {
 
       DB.addComment(incoming);
 
-      if (config.autoReplyEnabled) {
+      if (isBotEnabled()) {
         const history = messages
           .slice(-7, -1)
           .map(m => ({
@@ -427,7 +431,7 @@ async function updateActivePostsList() {
 setInterval(updateActivePostsList, 180000);
 
 async function syncVideoComments() {
-  if (isPollingComments || !config.autoReplyEnabled) return;
+  if (isPollingComments || !isBotEnabled()) return;
   isPollingComments = true;
 
   try {
