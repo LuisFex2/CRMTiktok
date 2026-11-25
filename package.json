@@ -1,5 +1,5 @@
 {
-  "name": "tiktok-zernio-crm",
+  "name": "crmtiktok",
   "version": "1.0.0",
   "description": "Enterprise TikTok AI CRM & Automation Platform",
   "main": "server.js",
