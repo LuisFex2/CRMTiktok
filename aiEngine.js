@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+﻿import dotenv from 'dotenv';
 dotenv.config();
 
 export class AIEngine {
@@ -109,13 +109,15 @@ Instrucciones de clasificación y respuesta:
     }
 
     // 2.2 REGLAS DINÁMICAS DIRECTAS DEL CRM (Palabras clave fijas de Automatizaciones)
-    const commentRules = rules.comments || [];
-    for (const rule of commentRules) {
-      if (this.matchesKeywords(rawText, rule.keywords)) {
-        return rule.response;
+    // 2.2 REGLAS DINAMICAS DEL CRM (solo si rulesEnabled !== false)
+    if (this.config.rulesEnabled !== false) {
+      const commentRules = rules.comments || [];
+      for (const rule of commentRules) {
+        if (this.matchesKeywords(rawText, rule.keywords)) {
+          return rule.response;
+        }
       }
     }
-
     // 2.3 AGENTE DE IA: Solo si el switch de Agente IA está encendido
     if (aiEnabled) {
       const geminiReply = await this.consultGemini(rawText, false);
@@ -143,18 +145,20 @@ Instrucciones de clasificación y respuesta:
     const rawText = (text || '').trim();
     const rules = this.config.rules || {};
     const aiEnabled = this.config.aiAgentEnabled !== false;
+
     const dmRules = rules.dms || [];
 
-    // 3.1 EVALUAR REGLAS DINÁMICAS DE DM (Palabras clave fijas)
-    for (const rule of dmRules) {
-      if (this.matchesKeywords(rawText, rule.keywords)) {
-        return {
-          message: rule.message,
-          followUp: rule.sendWhatsappBubble ? this.getOfficialWhatsapp() : null
-        };
+    // 3.1 EVALUAR REGLAS DINAMICAS DE DM (solo si rulesEnabled !== false)
+    if (this.config.rulesEnabled !== false) {
+      for (const rule of dmRules) {
+        if (this.matchesKeywords(rawText, rule.keywords)) {
+          return {
+            message: rule.message,
+            followUp: rule.sendWhatsappBubble ? this.getOfficialWhatsapp() : null
+          };
+        }
       }
     }
-
     // 3.2 CONSULTAR AL AGENTE DE IA (Solo si está encendido)
     if (aiEnabled) {
       const geminiReply = await this.consultGemini(rawText, true);

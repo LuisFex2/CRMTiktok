@@ -75,13 +75,9 @@
     </div>
 
     <div class="nav-right">
-      <div class="toggle-container">
-        <span class="toggle-label">Automatización IA:</span>
-        <label class="switch">
-          <input type="checkbox" id="autoReplyToggle" checked>
-          <span class="slider round"></span>
-        </label>
-        <span class="toggle-status" id="toggleStatusText">ACTIVADA</span>
+      <div id="botStatusBadge" style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:999px;background:rgba(16,185,129,0.15);border:1px solid #10B981;color:#10B981;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span>
+        <span id="botStatusLabel">Bot Activo</span>
       </div>
     </div>
   </header>
@@ -246,14 +242,35 @@
                 <p class="section-desc" style="margin-bottom: 0;">Cree y gestione agentes de IA con fuentes de conocimiento y prompt para respuestas automatizadas.</p>
               </div>
 
-              <!-- SWITCH PRINCIPAL DEL AGENTE IA -->
-              <div class="toggle-container" style="background: rgba(37, 244, 238, 0.08); border-color: rgba(37, 244, 238, 0.3);">
-                <span class="toggle-label" style="color: #fff; font-weight: 700;">⚡ Modo agéntico (IA):</span>
-                <label class="switch">
-                  <input type="checkbox" id="aiAgentSwitch" checked>
-                  <span class="slider round"></span>
-                </label>
-                <span class="toggle-status" id="aiAgentStatusText">ACTIVO</span>
+              <!-- DOS SWITCHES INDEPENDIENTES -->
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+
+                <!-- SWITCH 1: AUTOMATIZACIONES (REGLAS) -->
+                <div class="toggle-container" style="background:rgba(234,179,8,0.08);border-color:rgba(234,179,8,0.35);flex:1;min-width:200px;">
+                  <div>
+                    <span class="toggle-label" style="color:#FBBF24;font-weight:700;">⚡ Automatizaciones</span>
+                    <span style="display:block;font-size:0.7rem;color:var(--text-dim);margin-top:1px;">Reglas de palabras clave</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="rulesSwitch" checked>
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="toggle-status" id="rulesSwitchStatus" style="color:#FBBF24;">ACTIVAS</span>
+                </div>
+
+                <!-- SWITCH 2: AGENTE IA -->
+                <div class="toggle-container" style="background:rgba(37,244,238,0.08);border-color:rgba(37,244,238,0.35);flex:1;min-width:200px;">
+                  <div>
+                    <span class="toggle-label" style="color:#25F4EE;font-weight:700;">🤖 Agente IA</span>
+                    <span style="display:block;font-size:0.7rem;color:var(--text-dim);margin-top:1px;">Gemini 3.5 Flash</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="aiAgentSwitch" checked>
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="toggle-status" id="aiAgentStatusText" style="color:#25F4EE;">ACTIVO</span>
+                </div>
+
               </div>
             </div>
 
@@ -274,10 +291,11 @@
             </div>
 
             <!-- EXPLICACIÓN DINÁMICA DEL ESTADO -->
-            <div id="aiModeNoticeBox" class="info-alert" style="margin-bottom: 1.5rem;">
-              <strong id="aiModeNoticeTitle">🟢 Modo Agéntico Activo:</strong>
-              <p id="aiModeNoticeDesc" style="margin-top: 0.25rem;">
-                El bot primero responderá con tus <strong>reglas de palabras clave</strong>. Si el cliente escribe con faltas de ortografía (ej. <em>"aun tienen en stok"</em>) o hace preguntas abiertas, el Agente IA de Gemini analiza la intención y responde según tu Prompt oficial.
+            <!-- CAJA DE MODO ACTIVO (se actualiza dinámicamente desde app.js) -->
+            <div id="aiModeNoticeBox" class="info-alert" style="margin-bottom:1.5rem;">
+              <strong id="aiModeNoticeTitle">🟢 Modo Híbrido Activo</strong>
+              <p id="aiModeNoticeDesc" style="margin-top:0.25rem;">
+                El bot primero responde con tus <strong>reglas de palabras clave</strong>. Si el mensaje no coincide con ninguna regla, el <strong>Agente IA Gemini</strong> analiza la intención y responde según tu Prompt.
               </p>
             </div>
 

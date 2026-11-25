@@ -1,4 +1,4 @@
-// Estado global
+﻿// Estado global
 let comments = [];
 let currentFilter = 'all';
 
@@ -22,7 +22,7 @@ async function loadStatus() {
         document.getElementById('accUsername').textContent = `@${data.account.username || 'rematesvillaelsalvador'}`;
         document.getElementById('accFollowers').textContent = `${((data.account.followersCount || 16975) / 1000).toFixed(1)}K seguidores • Conectado`;
       }
-      autoReplyToggle.checked = !!data.autoReplyEnabled;
+      if (autoReplyToggle) autoReplyToggle.checked = !!data.autoReplyEnabled;
       updateToggleLabel(data.autoReplyEnabled);
     }
   } catch (err) {
@@ -143,21 +143,22 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// 3. Toggle de Automatización IA
-autoReplyToggle.addEventListener('change', async (e) => {
-  const enabled = e.target.checked;
-  updateToggleLabel(enabled);
-
-  try {
-    await fetch('/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ autoReplyEnabled: enabled })
-    });
-  } catch (err) {
-    console.error('Error al actualizar autoReply:', err);
-  }
-});
+// 3. Toggle de Automatización IA (ya no está en el navbar, pero se conserva por compatibilidad)
+if (autoReplyToggle) {
+  autoReplyToggle.addEventListener('change', async (e) => {
+    const enabled = e.target.checked;
+    updateToggleLabel(enabled);
+    try {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autoReplyEnabled: enabled })
+      });
+    } catch (err) {
+      console.error('Error al actualizar autoReply:', err);
+    }
+  });
+}
 
 function updateToggleLabel(enabled) {
   if (enabled) {
@@ -302,7 +303,7 @@ async function loadBusinessConfig() {
       document.getElementById('cfgPayments').value = data.businessInfo.cardPayment || '';
     }
 
-    updateAgentUiState(data.aiAgentEnabled !== false);
+    updateAgentUiState(data.aiAgentEnabled !== false, data.rulesEnabled !== false);
 
     const agentKeyInput = document.getElementById('cfgAgentGeminiKey');
     if (agentKeyInput) {
@@ -317,46 +318,90 @@ async function loadBusinessConfig() {
   }
 }
 
-// 11. Control de Estado y Formulario del Agente de IA
+// 11. Control de los DOS switches independientes
 const aiAgentSwitch = document.getElementById('aiAgentSwitch');
 const aiAgentStatusText = document.getElementById('aiAgentStatusText');
+const rulesSwitch = document.getElementById('rulesSwitch');
+const rulesSwitchStatus = document.getElementById('rulesSwitchStatus');
 const cardAgentState = document.getElementById('cardAgentState');
 const aiModeNoticeTitle = document.getElementById('aiModeNoticeTitle');
 const aiModeNoticeDesc = document.getElementById('aiModeNoticeDesc');
 
-function updateAgentUiState(enabled) {
-  if (aiAgentSwitch) aiAgentSwitch.checked = enabled;
+function updateModeSummary() {
+  const aiOn = aiAgentSwitch ? aiAgentSwitch.checked : false;
+  const rulesOn = rulesSwitch ? rulesSwitch.checked : false;
+  const badge = document.getElementById('botStatusBadge');
+  const badgeLabel = document.getElementById('botStatusLabel');
+  if (badge && badgeLabel) {
+    if (!aiOn && !rulesOn) {
+      badge.style.cssText = 'display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:999px;background:rgba(148,163,184,0.1);border:1px solid #475569;color:#94A3B8;';
+      badgeLabel.textContent = 'Bot Silenciado';
+    } else {
+      badge.style.cssText = 'display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:999px;background:rgba(16,185,129,0.15);border:1px solid #10B981;color:#10B981;';
+      badgeLabel.textContent = 'Bot Activo';
+    }
+  }
+  if (!aiModeNoticeTitle || !aiModeNoticeDesc) return;
+  if (aiOn && rulesOn) {
+    aiModeNoticeTitle.innerHTML = '🟢 Modo Hibrido';
+    aiModeNoticeTitle.style.color = '#10B981';
+    if (cardAgentState) { cardAgentState.textContent = '🟢 Activo'; cardAgentState.style.color = '#10B981'; }
+    aiModeNoticeDesc.innerHTML = 'El bot primero revisa las <strong>Reglas de palabras clave</strong>. Si no hay coincidencia, el <strong>Agente IA Gemini</strong> analiza la intencion del cliente y responde segun tu Prompt.';
+  } else if (!aiOn && rulesOn) {
+    aiModeNoticeTitle.innerHTML = '⚡ Solo Automatizaciones (sin IA)';
+    aiModeNoticeTitle.style.color = '#FBBF24';
+    if (cardAgentState) { cardAgentState.textContent = '⚡ Solo Reglas'; cardAgentState.style.color = '#FBBF24'; }
+    aiModeNoticeDesc.innerHTML = 'El bot responde <strong>solo con tus reglas de palabras clave</strong>. La IA esta apagada — cero tokens consumidos.';
+  } else if (aiOn && !rulesOn) {
+    aiModeNoticeTitle.innerHTML = '🤖 Solo Agente IA (sin reglas)';
+    aiModeNoticeTitle.style.color = '#25F4EE';
+    if (cardAgentState) { cardAgentState.textContent = '🤖 Solo IA'; cardAgentState.style.color = '#25F4EE'; }
+    aiModeNoticeDesc.innerHTML = 'El <strong>Agente IA Gemini</strong> responde a todos los mensajes directamente, ignorando las reglas de palabras clave.';
+  } else {
+    aiModeNoticeTitle.innerHTML = '⚫ Bot Silenciado';
+    aiModeNoticeTitle.style.color = '#94A3B8';
+    if (cardAgentState) { cardAgentState.textContent = '⚫ Silenciado'; cardAgentState.style.color = '#94A3B8'; }
+    aiModeNoticeDesc.innerHTML = 'Ambos sistemas estan <strong>apagados</strong>. El bot no respondera automaticamente a ningun mensaje.';
+  }
+}
+
+function updateAgentUiState(aiEnabled, rulesEnabled) {
+  if (aiAgentSwitch) aiAgentSwitch.checked = aiEnabled;
   if (aiAgentStatusText) {
-    aiAgentStatusText.textContent = enabled ? 'ACTIVO' : 'EN PAUSA';
-    aiAgentStatusText.style.color = enabled ? '#10B981' : '#94A3B8';
+    aiAgentStatusText.textContent = aiEnabled ? 'ACTIVO' : 'EN PAUSA';
+    aiAgentStatusText.style.color = aiEnabled ? '#25F4EE' : '#94A3B8';
   }
-  if (cardAgentState) {
-    cardAgentState.textContent = enabled ? '🟢 Activo' : '⚪ En Pausa';
-    cardAgentState.style.color = enabled ? '#10B981' : '#94A3B8';
+  if (rulesSwitch) rulesSwitch.checked = rulesEnabled;
+  if (rulesSwitchStatus) {
+    rulesSwitchStatus.textContent = rulesEnabled ? 'ACTIVAS' : 'EN PAUSA';
+    rulesSwitchStatus.style.color = rulesEnabled ? '#FBBF24' : '#94A3B8';
   }
-  if (aiModeNoticeTitle) {
-    aiModeNoticeTitle.textContent = enabled ? '🟢 Modo Agéntico Activo:' : '⚪ Modo Tradicional Activo (Solo Reglas):';
-  }
-  if (aiModeNoticeDesc) {
-    aiModeNoticeDesc.innerHTML = enabled
-      ? 'El bot responderá a tus <strong>reglas de palabras clave</strong> y, si el cliente escribe con faltas de ortografía (ej. <em>"aun tienen en stok"</em>) o dudas abiertas, la IA de Gemini analiza y responde con tu Prompt oficial.'
-      : 'La Inteligencia Artificial está <strong>apagada</strong> (cero consumo de tokens). El bot responde <strong>ÚNICAMENTE</strong> cuando el cliente escribe exactamente las palabras clave de la pestaña <strong>Automatizaciones</strong>.';
-  }
+  updateModeSummary();
 }
 
 if (aiAgentSwitch) {
   aiAgentSwitch.addEventListener('change', async (e) => {
-    const enabled = e.target.checked;
-    updateAgentUiState(enabled);
-    try {
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ aiAgentEnabled: enabled })
-      });
-    } catch (err) {
-      console.error('Error al actualizar estado del agente:', err);
+    if (aiAgentStatusText) {
+      aiAgentStatusText.textContent = e.target.checked ? 'ACTIVO' : 'EN PAUSA';
+      aiAgentStatusText.style.color = e.target.checked ? '#25F4EE' : '#94A3B8';
     }
+    updateModeSummary();
+    try {
+      await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ aiAgentEnabled: e.target.checked }) });
+    } catch (err) { console.error('Error al actualizar Agente IA:', err); }
+  });
+}
+
+if (rulesSwitch) {
+  rulesSwitch.addEventListener('change', async (e) => {
+    if (rulesSwitchStatus) {
+      rulesSwitchStatus.textContent = e.target.checked ? 'ACTIVAS' : 'EN PAUSA';
+      rulesSwitchStatus.style.color = e.target.checked ? '#FBBF24' : '#94A3B8';
+    }
+    updateModeSummary();
+    try {
+      await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rulesEnabled: e.target.checked }) });
+    } catch (err) { console.error('Error al actualizar Reglas:', err); }
   });
 }
 
