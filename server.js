@@ -364,11 +364,20 @@ async function syncDirectMessages() {
             text: (m.message || '').trim()
           }))
           .filter(h => h.text);
-        const aiResult = await ai.generateResponse({ text, username, isDM: true, history });
+        let aiResult;
+        try {
+          aiResult = await ai.generateResponse({ text, username, isDM: true, history });
+        } catch (aiErr) {
+          console.error(`[TikTok DM] ❌ Error Gemini para @${username}: ${aiErr.message}`);
+          processedKeys.add(lastMsg.id);
+          saveProcessedKeys(processedKeys);
+          continue;
+        }
         const firstMsg = typeof aiResult === 'object' ? aiResult.message : aiResult;
         const followUp = typeof aiResult === 'object' ? aiResult.followUp : null;
 
         if (!firstMsg) {
+          console.log(`[TikTok DM] ⏭️ Sin respuesta (silencio/filtro) para @${username}`);
           processedKeys.add(lastMsg.id);
           saveProcessedKeys(processedKeys);
           continue;
@@ -385,7 +394,7 @@ async function syncDirectMessages() {
           processedKeys.add(lastMsg.id);
           saveProcessedKeys(processedKeys);
           DB.updateCommentReply(incoming.id, firstMsg + (followUp ? ` \n[+ Bloque 2: ${followUp}]` : ''), 'ai');
-          console.log(`[TikTok DM] Entregado a @${username}`);
+          console.log(`[TikTok DM] ✅ Entregado a @${username}`);
 
           if (followUp) {
             await new Promise(r => setTimeout(r, 700));
@@ -394,13 +403,15 @@ async function syncDirectMessages() {
               conversationId: convId,
               message: followUp
             });
-            console.log(`[TikTok DM] Bloque 2 (WhatsApp) entregado a @${username}`);
+            console.log(`[TikTok DM] ✅ Bloque 2 (WhatsApp) entregado a @${username}`);
           }
+        } else {
+          console.error(`[TikTok DM] ❌ Zernio falló al enviar a @${username}:`, JSON.stringify(sendData));
         }
       }
     }
   } catch (err) {
-    // Manejo silencioso de reconexión
+    console.error(`[Sync DM] ❌ Error general:`, err.message);
   } finally {
     isPollingDMs = false;
   }
@@ -506,7 +517,7 @@ async function syncVideoComments() {
       }
     }
   } catch (err) {
-    // Manejo silencioso de reconexión
+    console.error(`[Sync Comentarios] ❌ Error general:`, err.message);
   } finally {
     isPollingComments = false;
   }
