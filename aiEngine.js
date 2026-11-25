@@ -96,32 +96,45 @@ Instrucciones de clasificación y respuesta:
     this.keyIndex = (startIndex + 1) % keys.length;
 
     for (let attempt = 0; attempt < keys.length; attempt++) {
+      const keyNum = ((startIndex + attempt) % keys.length) + 1;
       const apiKey = keys[(startIndex + attempt) % keys.length];
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
+        console.log(`[Gemini AI] ⏳ Consultando con token #${keyNum}...`);
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: systemPrompt }] }]
-          })
+          }),
+          signal: controller.signal
         });
+        clearTimeout(timeout);
 
         if (!res.ok) {
-          console.warn(`[Gemini AI] Token #${((startIndex + attempt) % keys.length) + 1} devolvió HTTP ${res.status}, probando siguiente...`);
+          const errBody = await res.text().catch(() => '');
+          console.warn(`[Gemini AI] ❌ Token #${keyNum} HTTP ${res.status}: ${errBody.substring(0, 200)}`);
           continue;
         }
         const data = await res.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (!reply) return null;
+        if (!reply) {
+          console.warn(`[Gemini AI] ⚠️ Token #${keyNum} respondió pero sin texto útil`);
+          return null;
+        }
         if (reply.toUpperCase().includes('SILENCIO')) {
+          console.log(`[Gemini AI] 🔇 Respuesta: SILENCIO`);
           return '__SILENCE__';
         }
+        console.log(`[Gemini AI] ✅ Respuesta generada (${reply.length} chars)`);
         return reply;
       } catch (err) {
-        console.warn('[Gemini AI]', err.message);
+        console.warn(`[Gemini AI] ❌ Token #${keyNum} error: ${err.message}`);
       }
     }
+    console.warn(`[Gemini AI] ❌ Todos los tokens fallaron`);
     return null;
   }
 
