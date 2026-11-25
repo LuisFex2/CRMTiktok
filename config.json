@@ -2,7 +2,8 @@
   "businessName": "Remates Villa El Salvador",
   "accountId": "6b045c6eb9e97da7ab40d8a7",
   "autoReplyEnabled": true,
-  "replyMode": "auto",
+  "replyMode": "hybrid",
+  "geminiApiKey": "",
   "businessInfo": {
     "whatsapp": "994 516 143",
     "address": "Av. Velasco Alvarado 718, Villa El Salvador",

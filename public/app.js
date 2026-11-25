@@ -198,6 +198,26 @@ async function sendQuickTemplate(conversationId, category) {
   }
 }
 
+// 6. Respuesta Instantánea con IA para elemento pendiente
+async function quickAiReply(id, encodedText, username, postId, conversationId) {
+  const text = decodeURIComponent(encodedText);
+  try {
+    const res = await fetch('/api/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, text, username, postId, conversationId })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      loadComments();
+    } else {
+      alert(data.error || 'No se pudo generar respuesta');
+    }
+  } catch (err) {
+    alert('Error al responder: ' + err.message);
+  }
+}
+
 // 7. Eliminar Elemento Individual
 async function deleteComment(id) {
   try {
@@ -281,6 +301,14 @@ async function loadBusinessConfig() {
       document.getElementById('cfgDelivery').value = data.businessInfo.delivery || '';
       document.getElementById('cfgPayments').value = data.businessInfo.cardPayment || '';
     }
+    const replyModeSelect = document.getElementById('cfgReplyMode');
+    if (replyModeSelect) {
+      replyModeSelect.value = data.replyMode || 'hybrid';
+    }
+    const geminiKeyInput = document.getElementById('cfgGeminiKey');
+    if (geminiKeyInput) {
+      geminiKeyInput.value = data.geminiApiKey || '';
+    }
   } catch (err) {
     console.warn('Error al cargar config:', err);
   }
@@ -294,6 +322,8 @@ configForm.addEventListener('submit', async (e) => {
 
   const payload = {
     businessName: document.getElementById('cfgBusinessName').value,
+    replyMode: document.getElementById('cfgReplyMode')?.value || 'hybrid',
+    geminiApiKey: document.getElementById('cfgGeminiKey')?.value.trim() || '',
     businessInfo: {
       whatsapp: document.getElementById('cfgWhatsapp').value,
       address: document.getElementById('cfgAddress').value,

@@ -258,6 +258,27 @@
               <label>Métodos de Pago:</label>
               <input type="text" id="cfgPayments">
 
+              <!-- CONFIGURACIÓN DE IA Y TOKEN -->
+              <div class="rule-box" style="border-left: 3px solid var(--tiktok-cyan); margin: 0.8rem 0; padding: 1rem; background: rgba(0,0,0,0.3);">
+                <div class="rule-box-header" style="margin-bottom: 0.6rem;">
+                  <span class="rule-title">🧠 Modo de Respuestas del Bot</span>
+                  <span class="rule-pill pill-wa">Control Inteligente</span>
+                </div>
+                
+                <label>Selecciona cómo debe responder el CRM:</label>
+                <select id="cfgReplyMode" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:0.65rem; color:#fff; font-size:0.85rem; margin-top:0.3rem; margin-bottom:0.8rem;">
+                  <option value="hybrid">🟢 Híbrido Inteligente (Reglas fijas + IA rescata faltas ortográficas)</option>
+                  <option value="rules_only">⚡ Solo Reglas y Palabras Clave (Sin IA - Cero consumo de tokens)</option>
+                  <option value="gemini_only">🧠 Solo Inteligencia Artificial (Gemini analiza y responde todo)</option>
+                </select>
+
+                <label>Token / Clave de API de Gemini (Google AI Studio):</label>
+                <input type="text" id="cfgGeminiKey" placeholder="Pega aquí tu clave AQ... o AIzaSy..." style="margin-top:0.3rem;">
+                <small style="color:var(--text-dim); font-size:0.73rem; display:block; margin-top:0.35rem;">
+                  💡 Puedes cambiar o renovar tu Token aquí directamente sin tocar código.
+                </small>
+              </div>
+
               <button type="submit" class="btn-secondary">💾 Guardar Cambios</button>
               <span id="saveNotice" class="save-notice"></span>
             </form>

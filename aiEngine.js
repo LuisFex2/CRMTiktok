@@ -34,7 +34,7 @@ export class AIEngine {
   // 1. EVALUACIÓN INTELIGENTE CON GOOGLE GEMINI (COMPRENDE ERRORES Y SLANG)
   // ---------------------------------------------------------------------------
   async consultGemini(text, isDM = false) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = this.config.geminiApiKey || process.env.GEMINI_API_KEY;
     if (!apiKey) return null;
 
     const phone = this.getOfficialWhatsapp();
@@ -87,6 +87,7 @@ Instrucciones de clasificación y respuesta:
   async generateCommentResponse({ text }) {
     const rawText = (text || '').trim();
     const rules = this.config.rules || {};
+    const mode = this.config.replyMode || 'hybrid';
 
     // 2.1 FILTRO RÁPIDO DE SILENCIO (BROMAS, RISAS, MEMES) -> NO RESPONDER
     if (this.matchesKeywords(rawText, rules.silenceKeywords)) {
@@ -99,7 +100,12 @@ Instrucciones de clasificación y respuesta:
       return null;
     }
 
-    // 2.2 REGLAS DINÁMICAS DIRECTAS DEL CRM
+    // MODO SOLO IA: Salta las palabras fijas y consulta directamente a Gemini
+    if (mode === 'gemini_only') {
+      return await this.consultGemini(rawText, false);
+    }
+
+    // 2.2 REGLAS DINÁMICAS DIRECTAS DEL CRM (Palabras clave)
     const commentRules = rules.comments || [];
     for (const rule of commentRules) {
       if (this.matchesKeywords(rawText, rule.keywords)) {
@@ -107,13 +113,17 @@ Instrucciones de clasificación y respuesta:
       }
     }
 
-    // 2.3 CEREBRO IA GEMINI: Para faltas ortográficas ("stok", "keda"), preguntas abiertas o modismos
+    // SI EL MODO ES 'rules_only', NO llama a Gemini y guarda silencio si no hay coincidencia
+    if (mode === 'rules_only') {
+      return null;
+    }
+
+    // 2.3 MODO HÍBRIDO (DEFAULT): Si ninguna regla fija coincidió, la IA analiza y rescata
     const geminiReply = await this.consultGemini(rawText, false);
     if (geminiReply) {
       return geminiReply;
     }
 
-    // Si no coincide con ninguna intención comercial -> Silencio total
     return null;
   }
 
@@ -131,9 +141,21 @@ Instrucciones de clasificación y respuesta:
 
     const rawText = (text || '').trim();
     const rules = this.config.rules || {};
+    const mode = this.config.replyMode || 'hybrid';
     const dmRules = rules.dms || [];
 
-    // 3.1 EVALUAR REGLAS DINÁMICAS DE DM
+    // MODO SOLO IA EN DMS
+    if (mode === 'gemini_only') {
+      const geminiReply = await this.consultGemini(rawText, true);
+      if (geminiReply) {
+        return {
+          message: geminiReply,
+          followUp: this.getOfficialWhatsapp()
+        };
+      }
+    }
+
+    // 3.1 EVALUAR REGLAS DINÁMICAS DE DM (Palabras clave)
     for (const rule of dmRules) {
       if (this.matchesKeywords(rawText, rule.keywords)) {
         return {
@@ -143,13 +165,15 @@ Instrucciones de clasificación y respuesta:
       }
     }
 
-    // 3.2 CONSULTAR A GEMINI SI HAY PREGUNTA ABIERTA O CON FALTAS ORTOGRÁFICAS
-    const geminiReply = await this.consultGemini(rawText, true);
-    if (geminiReply) {
-      return {
-        message: geminiReply,
-        followUp: this.getOfficialWhatsapp()
-      };
+    // 3.2 SI EL MODO ES HÍBRIDO: Consultar a Gemini si no coincidió con ninguna regla fija
+    if (mode === 'hybrid') {
+      const geminiReply = await this.consultGemini(rawText, true);
+      if (geminiReply) {
+        return {
+          message: geminiReply,
+          followUp: this.getOfficialWhatsapp()
+        };
+      }
     }
 
     // 3.3 FALLBACK DE CIERRE DIRECTO A WHATSAPP

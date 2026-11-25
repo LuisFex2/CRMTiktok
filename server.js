@@ -98,7 +98,11 @@ app.get('/api/comments', (req, res) => {
 });
 
 app.get('/api/config', (req, res) => {
-  res.json(loadConfig());
+  const cfg = loadConfig();
+  if (process.env.GEMINI_API_KEY) {
+    cfg.geminiApiKey = process.env.GEMINI_API_KEY;
+  }
+  res.json(cfg);
 });
 
 app.get('/api/rules', (req, res) => {
@@ -119,10 +123,26 @@ app.post('/api/rules', (req, res) => {
 
 app.post('/api/config', (req, res) => {
   try {
-    config = { ...config, ...req.body };
+    const { geminiApiKey, ...rest } = req.body;
+    if (typeof geminiApiKey === 'string') {
+      process.env.GEMINI_API_KEY = geminiApiKey.trim();
+      // Guardar también en .env local para persistencia segura
+      try {
+        const envPath = path.join(__dirname, '.env');
+        let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf-8') : '';
+        if (envContent.includes('GEMINI_API_KEY=')) {
+          envContent = envContent.replace(/GEMINI_API_KEY=.*/, `GEMINI_API_KEY=${geminiApiKey.trim()}`);
+        } else {
+          envContent += `\nGEMINI_API_KEY=${geminiApiKey.trim()}`;
+        }
+        fs.writeFileSync(envPath, envContent, 'utf-8');
+      } catch {}
+    }
+
+    config = { ...config, ...rest };
     saveConfig(config);
-    ai.updateConfig(config);
-    res.json({ ok: true, config });
+    ai.updateConfig({ ...config, geminiApiKey: process.env.GEMINI_API_KEY });
+    res.json({ ok: true, config: { ...config, geminiApiKey: process.env.GEMINI_API_KEY } });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
